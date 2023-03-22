@@ -5,7 +5,8 @@ class Event(models.Model):
     user = models.ForeignKey(User, default=None, on_delete=models.PROTECT)
     name = models.CharField(max_length=200)
     description = models.CharField(max_length=200)
-    # location = models.PointField(geography=True, spatial_index=True)
+    lng = models.DecimalField(max_digits=9, decimal_places=6)
+    lat = models.DecimalField(max_digits=9, decimal_places=6)
     date = models.DateTimeField()
     tag = models.CharField(max_length=200)
 
