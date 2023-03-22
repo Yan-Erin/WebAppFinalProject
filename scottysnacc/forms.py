@@ -2,6 +2,25 @@ from django import forms
 from django.contrib.auth import authenticate 
 from django.contrib.auth.models import User
 
+#TODO:(ERIN) Move to a constants.json file
+CMU_BUILDINGS = ["Tepper", "Gates", "Baker", "Wean", "Posner", "Porter", "The Cut", "Hunts Library"] 
+TAGS = ["Freshman", "Sophmore", "Junior", "Senior", "CIT", "SCS", "MCS", "HOA"]
+
+class NewEventForm(forms.Form):
+    name = forms.CharField(max_length=20, widget=forms.TextInput())
+    location = forms.MultipleChoiceField(choices = CMU_BUILDINGS)
+    event_time = forms.DateTimeField(input_formats=['%d/%m/%Y %H:%M:%S'], widget=forms.DateTimeInput(format='%d/%m/%Y %H:%M:%S'))
+    tag = forms.MultipleChoiceField(widget=forms.CheckboxSelectMultiple,
+                                          choices=TAGS)
+    decription = forms.CharField(max_length=100, widget=forms.TextInput())
+
+    def clean(self):
+        # Calls our parent (forms.Form) .clean function, gets a dictionary
+        # of cleaned data as a result
+        cleaned_data = super().clean()
+        return cleaned_data
+
+
 class LoginForm(forms.Form):
     email = forms.CharField(max_length=20, widget=forms.TextInput(attrs={'id': 'id_username',
                                                                             'class': "form-group form-control"}))
