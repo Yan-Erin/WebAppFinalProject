@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+
+{% block user-info %}
+    <div>
+        <a href="{% url 'login' %}">
+            <button id='id_login_link' class="btn btn-secondary">Login</button>
+        </a>
+    </div>
+{% endblock %}
+
+
+{% block content %}
+    <h1  id="id_page_name">Register for Scotty Snacc</h1>
+    <form method="post" class="form-group" action="{% url 'register' %}">
+        <table class="register-class">
+            {{form}}
+        </table>
+        {% csrf_token %}
+        <button class="btn btn-secondary" id='id_register_button' type="submit">Register</button>
+    </form>
+
+    {% for error in form.non_field_errors %}
+        <p class="error">
+            {{ error }}
+        </p>
+    {% endfor %}
+
+{% endblock %}

@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block user-info %}
+    <div>
+        <a id='id_register_link' href="{% url 'register' %}">
+            <button class="btn btn-secondary">Register</button>
+        </a>
+    </div>
+{% endblock %}
+
+{% block content %}
+    <p id='id_page_name'>Login:</p>
+    <form class="form-group" method="post" action="{% url 'login' %}">
+        <table class="login-class">
+            {{form}}
+        </table>
+        {% csrf_token %}
+        <button id='id_login_button' class="btn btn-secondary" type="submit">Submit</button>
+    </form>
+
+{% endblock %}

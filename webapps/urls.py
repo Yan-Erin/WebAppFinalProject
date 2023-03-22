@@ -18,5 +18,8 @@ from django.urls import path
 from scottysnacc import views
 
 urlpatterns = [
-    path('', views.main),
+    path('', views.map_action, name='home'),
+    path('login', views.login_action, name='login'),
+    path('logout', views.logout_action, name='logout'),
+    path('register', views.register_action, name='register'),
 ]
