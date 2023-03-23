@@ -25,6 +25,15 @@
         }
     </script>
     <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAz_8eAQta7W3gX5XwBswQDeNo2TmLCPXI&callback=initMap"></script>
+    <button onclick="makeNewEventBlock()">+</button>
+    <div class="event-block">
+    </div>
 </body>
-</html>
+
+<script>
+    window.onload = getEvent;
+// ... also call getList every 5 seconds hereafter to update the list
+    window.setInterval(getEvent, 5000);
+</script>
+
 {% endblock %}
