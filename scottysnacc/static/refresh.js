@@ -9,7 +9,7 @@ function getEvent() {
         updatePage(xhr)
     }
 
-    xhr.open("GET", "", true)
+    xhr.open("GET", "/scottysnacc/events", true)
     xhr.send()
 }
 
@@ -43,7 +43,7 @@ function updateEventList(items) {
     let list = document.getElementById("event_block")
    
     // Adds each to do list item received from the server to the displayed list
-    items["event-element"].forEach(item => {
+    items["events"].forEach(item => {
      // Check if item already exists on the page
      let existingItem =   document.getElementById(`id_event-element_${item.id}`);
 
@@ -58,7 +58,7 @@ function updateEventList(items) {
 // Builds a new HTML "li" element for the to do list
 function makeEventElement(item) {
     let details = `
-        <div id="id_event-element_${item.id}">
+        <div class="event" id="id_event-element_${item.id}">
             NEW EVENT ELEMENT
         </div>
     `
