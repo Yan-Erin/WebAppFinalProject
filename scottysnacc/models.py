@@ -7,6 +7,7 @@ class Event(models.Model):
     description = models.CharField(max_length=200)
     lng = models.DecimalField(max_digits=9, decimal_places=6)
     lat = models.DecimalField(max_digits=9, decimal_places=6)
+    specLocation = models.CharField(max_length=200)
     date = models.DateTimeField()
     tag = models.CharField(max_length=200)
 
