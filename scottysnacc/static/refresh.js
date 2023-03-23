@@ -9,7 +9,7 @@ function getEvent() {
         updatePage(xhr)
     }
 
-    xhr.open("GET", "/socialnetwork/", true)
+    xhr.open("GET", "", true)
     xhr.send()
 }
 
@@ -48,7 +48,7 @@ function updateEventList(items) {
      let existingItem =   document.getElementById(`id_event-element_${item.id}`);
 
      if (existingItem == null) {
-         // If not, add a new list item element
+         //If not, add a new list item element
          let element = makeEventElement(item);
          element.dataset.id = item.id;
          list.prepend(element);
