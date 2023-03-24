@@ -8,9 +8,9 @@ TAGS = ["Freshman", "Sophmore", "Junior", "Senior", "CIT", "SCS", "MCS", "HOA"]
 
 class LoginForm(forms.Form):
     email = forms.CharField(max_length=20, widget=forms.TextInput(attrs={'id': 'id_username',
-                                                                            'class': "form-group form-control"}))
+                                                                            'class': "form-item form-group form-control"}))
     password = forms.CharField(max_length=200, widget=forms.PasswordInput(attrs={'id': 'id_password',
-                                                                                 'class': "form-group form-control"}))
+                                                                                 'class': "form-item form-group form-control"}))
 
     # Customizes form validation for properties that apply to more
     # than one field.  Overrides the forms.Form.clean function.
@@ -32,16 +32,16 @@ class LoginForm(forms.Form):
 
 class RegisterForm(forms.Form):
     email      = forms.CharField(max_length=50,
-                                 widget=forms.EmailInput(attrs={'id': 'id_email', 'class': "form-control"}))
+                                 widget=forms.EmailInput(attrs={'id': 'id_email', 'class': "form-item form-control"}))
 
     password1  = forms.CharField(max_length=200,
                                  label='Password', 
                                  widget=forms.PasswordInput(attrs={'id': 'id_password',
-                                                                   'class': "form-control"}))
+                                                                   'class': "form-item form-control"}))
     password2  = forms.CharField(max_length=200,
                                  label='Confirm password',  
                                  widget=forms.PasswordInput( attrs={'id': 'id_confirm_password',
-                                                                    'class': "form-control"}))
+                                                                    'class': "form-item form-control"}))
 
     # Customizes form validation for properties that apply to more
     # than one field.  Overrides the forms.Form.clean function.
