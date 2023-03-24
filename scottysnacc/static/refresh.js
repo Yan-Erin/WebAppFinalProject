@@ -70,6 +70,7 @@ function makeEventElement(item) {
 
 function makeNewEventBlock() {
     console.log("MAKE NEW EVENT BLOCK MADE")
+    let elemet = document.getElementById("id_new_event")
     let details = `
         <div id="new-event-block">
             <h2>Add an Event</h2>
@@ -89,8 +90,8 @@ function makeNewEventBlock() {
             </div>
         </div>
     `
-    let element= document.createElement("div")
-    element.innerHTML = `${details}`
-
-    return element
+    let element= document.createElement("div");
+    element.innerHTML = `${details}`;
+    elemet.prepend(element);
+    return null
 }
