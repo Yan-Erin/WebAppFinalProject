@@ -69,4 +69,4 @@ class RegisterForm(forms.Form):
 
         # We must return the cleaned data we got from the cleaned_data
         # dictionary
-        return username
+        return email

@@ -16,6 +16,8 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from scottysnacc import views
+from django.conf.urls.static import static
+from django.conf import settings
 
 urlpatterns = [
     path('', views.map_action, name='home'),
@@ -23,4 +25,5 @@ urlpatterns = [
     path('logout', views.logout_action, name='logout'),
     path('register', views.register_action, name='register'),
     path("scottysnacc/events", views.get_events_json_dumps_serializer),
-]
+
+]  + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT) 

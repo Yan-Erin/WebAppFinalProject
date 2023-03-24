@@ -1,20 +1,25 @@
+{% load static %}
 <!doctype html>
 <html>
 	<head>
 	    <meta charset="utf-8">
-	    {% load static %}
 		<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
   		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.3/jquery.min.js"></script>
 		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+		<link rel="preconnect" href="https://fonts.googleapis.com">
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+		<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300&display=swap" rel="stylesheet">
+		<link href="{% static 'base.css' %}" rel="stylesheet">
 		<title> {% block title %} ScottySnacc {% endblock %} </title>
 		<script src="{% static 'refresh.js' %}" type="text/javascript"></script>
 	</head>
 
 	<body>
-	<nav class="navbar-expand-sm navbar navbar-light" style="background-color: #e3f2fd;" id="id_header_div">
+	<nav class="navbar-expand-sm navbar navbar-light" style="background-color: #B1A7A6;" id="id_header_div">
 		<div class="container-fluid">
-			<div id='id_site_name'class="navbar-header navbar-brand">
-				Scotty Snacc
+			<div id='id_site_name' class="navbar-header navbar-brand">
+				<img id="scotty_logo" src="{% static 'img/scotty_dog.png'%}">
+				<img id="scotty_text" src="{% static 'img/scotty_snacc_logo.png'%} ">
 			</div>
 
 				{% block user-info %}
