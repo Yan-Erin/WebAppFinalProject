@@ -30,7 +30,7 @@ body {
     border-radius: 0.75rem;
       
   }
-#login_maindiv {
+#login_maindiv, #register_maindiv {
     display: grid;
     grid-template-columns: 1fr 1fr;
     grid-gap: 20px;
