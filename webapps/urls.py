@@ -14,7 +14,7 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include
 from scottysnacc import views
 
 urlpatterns = [
@@ -23,4 +23,5 @@ urlpatterns = [
     path('logout', views.logout_action, name='logout'),
     path('register', views.register_action, name='register'),
     path("scottysnacc/events", views.get_events_json_dumps_serializer),
+    path('oauth/', include('social_django.urls', namespace='social')),
 ]

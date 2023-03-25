@@ -1,0 +1,9 @@
+[Django]
+Secret:
+
+[GoogleOAuth2]
+client_id:
+client_secret:
+
+[ScottySnacc]
+users=@andrew.cmu.edu

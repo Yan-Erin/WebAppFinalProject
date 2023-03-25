@@ -6,3 +6,4 @@ venv
 my_env
 .idea
 scottysnacc/config.ini
+*.ini
