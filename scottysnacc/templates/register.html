@@ -1,17 +1,21 @@
 {% extends "base.html" %}
-
+{% load static %}
 
 {% block user-info %}
     <div>
         <a href="{% url 'login' %}">
-            <button id='id_login_link' class="btn btn-secondary">Login</button>
+            <button id='id_login_link' class="logout_button">Login</button>
         </a>
     </div>
 {% endblock %}
 
 
 {% block content %}
-    <h1  id="id_page_name">Register for Scotty Snacc</h1>
+<divi id="register_maindiv">
+<div id="id_registerpg">
+    <p class="heading_name" >Register for Scotty Snacc</p>
+    <p id='id_page_name'>Register with  
+            <span style="color: #A4161A">ScottySnacc</span> today!</p>
     <form method="post" class="form-group" action="{% url 'register' %}">
         <table class="register-class">
             {{form}}
@@ -25,5 +29,11 @@
             {{ error }}
         </p>
     {% endfor %}
-
+</div>
+    <div class="loginimg_div">
+        <p class="right-header">Campus <span style="color: #A4161A">Cravings</span>?</p>
+        <p class="right-text">Find Free Food & Satisfy Your Hunger Around Campus!</p>
+	    <img id="loginimg" src="{% static 'img/register.png'%}">
+    </div>
+</div>
 {% endblock %}

@@ -1,21 +1,32 @@
 {% extends "base.html" %}
-
+{% load static %}
 {% block user-info %}
     <div>
         <a id='id_register_link' href="{% url 'register' %}">
-            <button class="btn btn-secondary">Register</button>
+            <button class="logout_button">Register</button>
         </a>
     </div>
 {% endblock %}
 
 {% block content %}
-    <p id='id_page_name'>Login:</p>
-    <form class="form-group" method="post" action="{% url 'login' %}">
-        <table class="login-class">
-            {{form}}
-        </table>
-        {% csrf_token %}
-        <button id='id_login_button' class="btn btn-secondary" type="submit">Submit</button>
-    </form>
-
+<div id="login_maindiv">
+    <div id="id_logindiv">
+        <p class="heading_name">Hello Again!</p>
+        <p id='id_page_name'>Enter your email and password to login to 
+            <span style="color: #A4161A">ScottySnacc:</span></p>
+        <form class="form-group" method="post" action="{% url 'login' %}">
+            <table class="login-class">
+                {{form}}
+            </table>
+            {% csrf_token %}
+            <button id='id_login_button' class="btn btn-secondary" type="submit">Submit</button>
+        </form>
+    </div>
+    
+    <div class="loginimg_div">
+        <p class="right-header">Campus <span style="color: #A4161A">Cravings</span>?</p>
+        <p class="right-text">Find Free Food & Satisfy Your Hunger Around Campus!</p>
+	    <img id="loginimg" src="{% static 'img/login.png'%}">
+    </div>
+</div>
 {% endblock %}
