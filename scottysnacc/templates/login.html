@@ -19,7 +19,10 @@
                 {{form}}
             </table>
             {% csrf_token %}
+            <span>
             <button id='id_login_button' class="btn btn-secondary" type="submit">Submit</button>
+            <a class="btn btn-google  btn-outline" style="background-color: #5076ce;margin-left:1rem; margin-top:3rem; border-radius:0.75rem; color:aliceblue" href="/oauth/login/google-oauth2/"><img style="background-color: aliceblue; padding:0.25rem;" src="https://img.icons8.com/color/16/000000/google-logo.png"> Signup Using Google</a>
+            </span>
         </form>
     </div>
     

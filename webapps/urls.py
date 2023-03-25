@@ -25,6 +25,5 @@ urlpatterns = [
     path('logout', views.logout_action, name='logout'),
     path('register', views.register_action, name='register'),
     path("scottysnacc/events", views.get_events_json_dumps_serializer),
-    path('oauth/', include('social_django.urls', namespace='social')),
-
+    path('oauth/', include('social_django.urls', namespace='social'), name='social'),
 ]  + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT) 
