@@ -3,8 +3,8 @@ from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
 
 #TODO:(ERIN) Move to a constants.json file
-CMU_BUILDINGS = ["Tepper", "Gates", "Baker", "Wean", "Posner", "Porter", "The Cut", "Hunts Library"] 
-TAGS = ["Freshman", "Sophmore", "Junior", "Senior", "CIT", "SCS", "MCS", "HOA"]
+CMU_BUILDINGS = ["Tepper", "Gates", "Baker", "Wean", "Posner", "Porter", "The Cut", "Hunts Library", "Frew Street", "CFA", "Hamerschlag"] 
+TAGS = ["Freshman", "Sophmore", "Junior", "Senior", "Undergrad", "Graduate", "CIT", "SCS", "MCS", "TPR", "CFA", "BXA", "DC"]
 
 class LoginForm(forms.Form):
     email = forms.CharField(max_length=20, widget=forms.TextInput(attrs={'id': 'id_username',
