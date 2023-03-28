@@ -201,6 +201,14 @@ function addEvent() {
         }
     });
 }
+function closeEvent() {
+    var x = document.getElementById("new-event-block");
+    if (x.style.display === "none") {
+      x.style.display = "block";
+    } else {
+      x.style.display = "none";
+    }
+}
 
 function makeNewEventBlock() {
     console.log("MAKE NEW EVENT BLOCK MADE")
@@ -215,6 +223,7 @@ function makeNewEventBlock() {
             </div>
             
             <div class='form-group event-form'>
+                <button class="close-btn" onclick="closeEvent()">X</button>
                 <label>Event Name</label>
                 <input type="text" name="name"  class="form-control" id="id_name_input_text"/>
 
