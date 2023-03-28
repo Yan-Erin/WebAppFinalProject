@@ -85,6 +85,7 @@ def register_action(request):
     return redirect(reverse('home'))
 
 def event_action(request):
+    #TODO more error handling
     if not request.user.is_authenticated:
         return _my_json_error_response("Not logged-in.", status=401)
     
@@ -102,13 +103,14 @@ def event_action(request):
     event.building = request.POST['building']
     event.description = request.POST['description']
     event.specLocation = request.POST['specLocation']
+    #TODO
     event.startdate = timezone.now()
     event.enddate = timezone.now()
     event.tag = request.POST['tag']
 
     event.save()
 
-    comment_data = [{
+    event_data = [{
         'user': event.user.id,
         'name': event.name,
         'lng': event.lng,
@@ -122,7 +124,7 @@ def event_action(request):
         'id': event.id,
     }]
 
-    response_data = {'events': comment_data}
+    response_data = {'events': event_data}
 
     response_json = json.dumps(response_data)
 
@@ -134,7 +136,7 @@ def get_events_json_dumps_serializer(request):
     
     event_data = []
     for event in models.Event.objects.all():
-        event = [{
+        event = {
         'user': event.user.id,
         'name': event.name,
         'lng': event.lng,
@@ -146,7 +148,7 @@ def get_events_json_dumps_serializer(request):
         'endDate': str(event.enddate),
         'tag': event.tag,
         'id': event.id,
-    }]
+    }
         event_data.append(event)
     
     response_data = {'events' : event_data}
