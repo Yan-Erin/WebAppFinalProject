@@ -80,9 +80,12 @@ function updateEventList(items) {
 }
 // Builds a new HTML "li" element for the to do list
 function makeEventElement(item) {
+    let startdate = new Date(`${item.startDate}`)
+    startdate = startdate.toLocaleDateString('en-us') + " " + startdate.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+
     let details = `
         <div class="event" id="id_event_element_${item.id}">
-        <p> ${item.name} </p>
+        <p> ${startdate} </p>
         </div>
     `
     let element = document.createElement("div")

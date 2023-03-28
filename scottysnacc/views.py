@@ -11,7 +11,6 @@ from django.http import HttpResponse, Http404
 import json
 from scottysnacc import models
 from datetime import datetime
-import pytz
 
 @login_required
 def map_action(request):
@@ -101,11 +100,8 @@ def event_action(request):
     event.building = request.POST['building']
     event.description = request.POST['description']
     event.specLocation = request.POST['specLocation']
-    print(request.POST['start'])
-    print(request.POST['start'])
-    tz = pytz.timezone('US/Eastern')
-    event.startdate = tz.localize(datetime.strptime(request.POST['start'], '%Y/%m/%d %H:%M'))
-    event.enddate = tz.localize(datetime.strptime(request.POST['end'], '%Y/%m/%d %H:%M'))
+    event.startdate = datetime.strptime(request.POST['start'], '%Y/%m/%d %H:%M')
+    event.enddate = datetime.strptime(request.POST['end'], '%Y/%m/%d %H:%M')
     event.tag = request.POST['tag']
 
     event.save()
