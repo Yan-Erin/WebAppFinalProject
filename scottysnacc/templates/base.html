@@ -9,9 +9,12 @@
 		<link rel="preconnect" href="https://fonts.googleapis.com">
 		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 		<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300&display=swap" rel="stylesheet">
+		<link  rel="stylesheet"  href="https://cdnjs.cloudflare.com/ajax/libs/jquery-datetimepicker/2.5.20/jquery.datetimepicker.min.css"/>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-datetimepicker/2.5.20/jquery.datetimepicker.full.min.js"></script>
 		<link href="{% static 'base.css' %}" rel="stylesheet">
 		<title> {% block title %} ScottySnacc {% endblock %} </title>
 		<script src="{% static 'refresh.js' %}" type="text/javascript"></script>
+		
 	</head>
 
 	<body>
@@ -34,7 +37,5 @@
             {% block map-ui %}
             {% endblock %}
         </div>
-	<script src="https://code.jquery.com/jquery-3.6.3.min.js" integrity="sha256-pvPw+upLPUjgMXY0G+8O0xUf+/Im1MZjXxxgOcBQBXU="
-		crossorigin="anonymous"></script>
 	</body>
 </html>

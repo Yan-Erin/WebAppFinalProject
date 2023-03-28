@@ -17,6 +17,11 @@ function setUpSearch() {
     let autocomplete = new google.maps.places.Autocomplete(building, options);
 }
 
+function setUpDateTime() {
+    $('#id_start_time_input_text').datetimepicker();
+    $('#id_end_time_input_text').datetimepicker();
+}
+
 // Sends a new request to update the to-do list
 function getEvent() {
     let xhr = new XMLHttpRequest()
@@ -68,7 +73,6 @@ function updateEventList(items) {
         if (document.getElementById(`id_event_element_${item.id}`) == null) {
             //If not, add a new list item element
             div.prepend(makeEventElement(item))
-            console.log("marker")
             let location = {lat: Number(item.lat), lng: Number(item.lng)}
             let marker = new google.maps.Marker({position: location, map: map})
         }
@@ -178,6 +182,7 @@ function makeNewEventBlock() {
     element.innerHTML = `${details}`;
     elemet.prepend(element);
     setUpSearch();
+    setUpDateTime();
     return null
 }
 
