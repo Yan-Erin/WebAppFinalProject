@@ -207,31 +207,37 @@ function makeNewEventBlock() {
     let elemet = document.getElementById("id_new_event")
     let details = `
         <div id="new-event-block">
-            <h2>Add an Event</h2>
-            <p> Fill out form to enter your event </p>
-            <div class='event-form'>
+            <div id="new-event-text">
+            <div class='new-event-img'>
+                <img  src="static/img/grid_small_round.svg" >
+                <h2>Add an Event</h2>
+                <p> Fill out form to enter your event </p>
+            </div>
+            
+            <div class='form-group event-form'>
                 <label>Event Name</label>
-                <input type="text" name="name"  id="id_name_input_text"/>
+                <input type="text" name="name"  class="form-control" id="id_name_input_text"/>
 
                 <label>Building Location</label>
-                <input type="text" name="building_location"  id="id_building_location_input_text"/>
+                <input type="text" name="building_location" class="form-control" id="id_building_location_input_text"/>
 
                 <label>Floor/Room Location</label>
-                <input type="text" name="specific_location"  id="id_specific_location_input_text"/>
+                <input type="text" name="specific_location" class="form-control" id="id_specific_location_input_text"/>
 
                 <label>Start Time</label>
-                <input type="text" name="start_time"  id="id_start_time_input_text"/>
+                <input type="text" name="start_time" class="form-control" id="id_start_time_input_text"/>
 
                 <label>End Time</label>
-                <input type="text" name="end_time"  id="id_end_time_input_text"/>
+                <input type="text" name="end_time" class="form-control" id="id_end_time_input_text"/>
 
                 <label>Description</label>
-                <input type="text" name="description"  id="id_description_input_text"/>
+                <input type="text" name="description" class="form-control" id="id_description_input_text"/>
 
                 <label>Tags</label>
-                <input type="text" name="tags"  id="id_tag_input_text"/>
+                <input type="text" name="tags" class="form-control" id="id_tag_input_text"/>
 
-                <button  onclick="addEvent()">+</button>
+                <button  id='event-submit' class='btn-default' onclick="addEvent()">Submit</button>
+            </div>
             </div>
         </div>
     `
