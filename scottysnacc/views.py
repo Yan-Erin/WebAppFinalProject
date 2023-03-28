@@ -42,40 +42,14 @@ def login_action(request):
     login(request, new_user)
     return redirect(reverse('home'))
 
-# def get_events_json_dumps_serializer(request):
-#     if not request.user.is_authenticated:
-#         return _my_json_error_response("You must be logged in to do this operation", status=401)
-#     response_data = {"events": []}
-#     for model_item in Event.objects.all():
-#         new_event = {
-#             'id': model_item.id,
-#             'user': model_item.user,
-#             'name':model_item.name,
-#             'description': model_item.description,
-#             'lng':model_item.lng,
-#             'lat':model_item.lat,
-#             'specLocation':model_item.specLocation,
-#             'startdate':model_item.startdate,
-#             'enddate':model_item.enddate,
-#             'tag':model_item.tag
-#         }
-#         response_data["event"].append(new_event)
-
-#     response_json = json.dumps(response_data)
-
-#     return HttpResponse(response_json, content_type='application/json')
-
-
 def _my_json_error_response(message, status=200):
     # You can create your JSON by constructing the string representation yourself (or just use json.dumps)
     response_json = '{"error": "' + message + '"}'
     return HttpResponse(response_json, content_type='application/json', status=status)
 
-
 def logout_action(request):
     logout(request)
     return redirect(reverse('login'))
-
 
 def register_action(request):
     context = {}
@@ -120,32 +94,26 @@ def event_action(request):
     if 'event_name' not in request.POST or not request.POST['event_name']:
         return _my_json_error_response("You must enter event name.", status=400)
     
-    # if 'event_id' not in request.POST or not request.POST['event_id']:
-    #     return _my_json_error_response("Invalid event id", status=400)
-    
-    # try:
-    #     int(request.POST['event_id'])
-    # except:
-    #     return _my_json_error_response("Invalid event id", status=400)
-    
     event = models.Event()
     event.user = request.user
     event.name = request.POST['event_name']
     event.lng = request.POST['lng']
-    event.lat = request.POST['lng']
-    event.description = "DESCRIPTION"
-    event.specLocation = "SPECLOCATION"
+    event.lat = request.POST['lat']
+    event.building = request.POST['building']
+    event.description = request.POST['description']
+    event.specLocation = request.POST['specLocation']
     event.startdate = timezone.now()
     event.enddate = timezone.now()
-    event.tag = "TAG"
+    event.tag = request.POST['tag']
 
     event.save()
 
     comment_data = [{
         'user': event.user.id,
         'name': event.name,
-        'lng': str(event.lng),
-        'lat': str(event.lat),
+        'lng': event.lng,
+        'lat': event.lat,
+        'building': event.building,
         'description': event.description,
         'specLocation': event.specLocation,
         'startDate': str(event.startdate),
@@ -161,16 +129,17 @@ def event_action(request):
     return HttpResponse(response_json, content_type='application/json')
 
 def get_events_json_dumps_serializer(request):
-    print("hii");
     if not request.user.is_authenticated:
         return _my_json_error_response("Not logged-in.", status=401)
+    
     event_data = []
     for event in models.Event.objects.all():
         event = [{
         'user': event.user.id,
         'name': event.name,
-        'lng': str(event.lng),
-        'lat': str(event.lat),
+        'lng': event.lng,
+        'lat': event.lat,
+        'building': event.building,
         'description': event.description,
         'specLocation': event.specLocation,
         'startDate': str(event.startdate),

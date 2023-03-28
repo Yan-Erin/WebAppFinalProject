@@ -7,6 +7,7 @@ class Event(models.Model):
     description = models.CharField(max_length=200, blank=True)
     lng = models.CharField(max_length=200)
     lat = models.CharField(max_length=200)
+    building = models.CharField(max_length=200)
     specLocation = models.CharField(max_length=200, blank=True)
     startdate = models.DateTimeField()
     enddate = models.DateTimeField()

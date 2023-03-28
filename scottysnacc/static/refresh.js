@@ -16,7 +16,7 @@ function getEvent() {
 function updatePage(xhr) {
     if (xhr.status === 200) {
         let response = JSON.parse(xhr.responseText)
-        updateEventList(response)
+        updateEventList(response["events"])
         return
     }
 
@@ -43,26 +43,22 @@ function updateError() {
 
 function updateEventList(items) {
     // Removes all existing to-do list items
-    let list = document.getElementById("event_block")
+    let div = document.getElementById("event_block")
    
     // Adds each to do list item received from the server to the displayed list
-    items["events"].forEach(item => {
-     // Check if item already exists on the page
-     let existingItem =  document.getElementById(`id_event-element_${item.id}`);
-
-     if (existingItem == null) {
-         //If not, add a new list item element
-         let element = makeEventElement(item);
-        //  element.dataset.id = item.id;
-        //  list.prepend(element);
-     }
+    items.forEach(item => {
+        // Check if item already exists on the page
+        if (document.getElementById(`id_event_element_${item.id}`) == null) {
+            //If not, add a new list item element
+            div.prepend(makeEventElement(item));
+        }
     });
 }
 // Builds a new HTML "li" element for the to do list
 function makeEventElement(item) {
     let details = `
-        <div class="event" id="id_event-element_${item.id}">
-            NEW EVENT ELEMENT
+        <div class="event" id="id_event_element_${item.id}">
+        <p> ${item.name} </p>
         </div>
     `
     let element = document.createElement("div")
@@ -71,30 +67,41 @@ function makeEventElement(item) {
     return element
 }
 
-function addEvent(user_id) {
-    let eventNameElement = document.getElementById(`id_name_input_text_${user_id}`)
+function addEvent() {
+    let eventNameElement = document.getElementById("id_name_input_text")
     let eventNameValue = eventNameElement.value
-
-    let buildingElement = document.getElementById(`id_building_location_input_text_${user_id}`)
+    let buildingElement = document.getElementById("id_building_location_input_text")
     let buildingValue = buildingElement.value
 
     let geocoder = new google.maps.Geocoder();
 
-    let lng;
-    let lat;
+    let lng = '';
+    let lat = '';
 
-    geocoder.geocode( {'address': buildingValue}, function(results, status) {
-        if (status == google.maps.GeocoderStatus.OK) {
-            lng = results[0].geometry.location.lng()
-            lat = results[0].geometry.location.lat()
-        }
-    });
+    let descriptionElement = document.getElementById("id_description_input_text")
+    let descriptionValue = descriptionElement.value
 
-    let descriptionElement = document.getElementById()
+    let specLocationElement = document.getElementById("id_specific_location_input_text")
+    let specLocationValue = specLocationElement.value
+
+    let startTimeElement = document.getElementById("id_start_time_input_text")
+    let startTimeValue = startTimeElement.value
+
+    let endTimeElement = document.getElementById("id_end_time_input_text")
+    let endTimeValue = endTimeElement.value
+
+    let tagElement = document.getElementById("id_tag_input_text")
+    let tagValue = tagElement.value
 
     // Continue reading events from 
 
     eventNameElement.value = ''
+    buildingElement.value = ''
+    descriptionElement.value = ''
+    specLocationElement.value = ''
+    startTimeElement.value = ''
+    endTimeElement.value = ''
+    tagElement.value = ''
 
     let xhr = new XMLHttpRequest()
     xhr.onreadystatechange = function() {
@@ -102,12 +109,22 @@ function addEvent(user_id) {
         updatePage(xhr)
     }
 
-    xhr.open("POST", `/scottysnacc/add-event`, true)
-    xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded")
-    xhr.send(`event_name=${eventNameValue}&lng=${lng}&lat=${lat}&csrfmiddlewaretoken=${getCSRFToken()}`)
+    geocoder.geocode( {'address': buildingValue}, function(results, status) {
+        if (status == google.maps.GeocoderStatus.OK) {
+            console.log("GEOCODER SUCCESS")
+            lng = String(results[0].geometry.location.lng())
+            
+            lat = String(results[0].geometry.location.lat())
+
+            xhr.open("POST", `/scottysnacc/add-event`, true)
+            xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded")
+            xhr.send(`event_name=${eventNameValue}&lng=${lng}&lat=${lat}&building=${buildingValue}&description=${descriptionValue}&specLocation=${specLocationValue}&start=${startTimeValue}&end=${endTimeValue}&tag=${tagValue}&csrfmiddlewaretoken=${getCSRFToken()}`)
+            
+        }
+    });
 }
 
-function makeNewEventBlock(user_id) {
+function makeNewEventBlock() {
     console.log("MAKE NEW EVENT BLOCK MADE")
     let elemet = document.getElementById("id_new_event")
     let details = `
@@ -116,24 +133,27 @@ function makeNewEventBlock(user_id) {
             <p> Fill out form to enter your event </p>
             <div class='event-form'>
                 <label>Event Name</label>
-                <input type="text" name="name"  id="id_name_input_text_${user_id}"/>
+                <input type="text" name="name"  id="id_name_input_text"/>
 
                 <label>Building Location</label>
-                <input type="text" name="building_location"  id="id_building_location_input_text_${user_id}"/>
+                <input type="text" name="building_location"  id="id_building_location_input_text"/>
 
                 <label>Floor/Room Location</label>
-                <input type="text" name="specific_location"  id="id_specific_location_input_text_${user_id}"/>
+                <input type="text" name="specific_location"  id="id_specific_location_input_text"/>
 
                 <label>Start Time</label>
-                <input type="text" name="start_time"  id="id_start_time_input_text_${user_id}"/>
+                <input type="text" name="start_time"  id="id_start_time_input_text"/>
 
                 <label>End Time</label>
-                <input type="text" name="end_time"  id="id_end_time_input_text_${user_id}"/>
+                <input type="text" name="end_time"  id="id_end_time_input_text"/>
 
                 <label>Description</label>
-                <input type="text" name="time"  id="id_description_input_text_${user_id}"/>
+                <input type="text" name="description"  id="id_description_input_text"/>
 
-                <button onclick="addEvent(${user_id})">+</button>
+                <label>Tags</label>
+                <input type="text" name="tags"  id="id_tag_input_text"/>
+
+                <button onclick="addEvent()">+</button>
             </div>
         </div>
     `
