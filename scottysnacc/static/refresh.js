@@ -177,7 +177,7 @@ function makeNewEventBlock() {
                 <label>Tags</label>
                 <input type="text" name="tags"  id="id_tag_input_text"/>
 
-                <button onclick="addEvent()">+</button>
+                <button  onclick="addEvent()">+</button>
             </div>
         </div>
     `
