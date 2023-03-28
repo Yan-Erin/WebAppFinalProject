@@ -11,6 +11,7 @@ from django.http import HttpResponse, Http404
 import json
 from scottysnacc import models
 from datetime import datetime
+from django.core.exceptions import ObjectDoesNotExist
 
 @login_required
 def map_action(request):
@@ -81,7 +82,7 @@ def register_action(request):
     login(request, new_user)
     return redirect(reverse('home'))
 
-def event_action(request):
+def add_action(request):
     #TODO more error handling
     if not request.user.is_authenticated:
         return _my_json_error_response("Not logged-in.", status=401)
@@ -125,6 +126,26 @@ def event_action(request):
     response_json = json.dumps(response_data)
 
     return HttpResponse(response_json, content_type='application/json')
+
+def delete_action(request, event_id):
+    print("im here")
+    if not request.user.is_authenticated:
+        return _my_json_error_response("You must be logged in to do this operation", status=401)
+
+    if request.method != 'POST':
+        return _my_json_error_response("You must use a POST request for this operation", status=405)
+
+    try:
+        event = models.Event.objects.get(id=event_id)
+    except ObjectDoesNotExist:
+        return _my_json_error_response(f"Item with id={event_id} does not exist.", status=404)
+
+    if request.user != event.user:
+        return _my_json_error_response("You cannot delete other user's entries", status=403)
+
+    event.delete()
+
+    return get_events_json_dumps_serializer(request)
 
 def get_events_json_dumps_serializer(request):
     if not request.user.is_authenticated:

@@ -16,13 +16,16 @@
             <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAz_8eAQta7W3gX5XwBswQDeNo2TmLCPXI&libraries=places&callback=initMap"></script>
             <div id="id_new_event"></div>
         </div>
-        <div id="event_block"></div>
+        <div id="event_block">
+            {{ request.user.id|json_script:"user_id" }}
+        </div>
     </div>
 
 <script>
     window.onload = getEvent;
 // ... also call getList every 5 seconds hereafter to update the list
     window.setInterval(getEvent, 5000);
+    const current_user = "{{ request.user.id }}"
 </script>
 
 {% endblock %}

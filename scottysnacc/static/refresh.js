@@ -31,17 +31,22 @@ function getEvent() {
     console.log("Refresh");
     xhr.onreadystatechange = function() {
         if (this.readyState !== 4) return
-        updatePage(xhr)
+        updatePage(xhr, false)
     }
 
     xhr.open("GET", "/scottysnacc/events", true)
     xhr.send()
 }
 
-function updatePage(xhr) {
+function updatePage(xhr, isDelete) {
     if (xhr.status === 200) {
         let response = JSON.parse(xhr.responseText)
-        updateEventList(response["events"])
+        if (isDelete) {
+            updateDeletedEventList(response["events"])
+        } else {
+            updateEventList(response["events"])
+        }
+        
         return
     }
 
@@ -89,6 +94,23 @@ function updateEventList(items) {
         }
     });
 }
+
+function updateDeletedEventList(items) {
+    let div = document.getElementById("event_block")
+
+    while (div.hasChildNodes()) {
+        div.firstChild.remove()
+    }
+
+    items.forEach(item => {
+        div.prepend(makeEventElement(item))
+        let location = {lat: Number(item.lat), lng: Number(item.lng)}
+        let marker = new google.maps.Marker({position: location, map: map})
+        marker.addListener("click", () => {
+            let eventElement = document.getElementById(`id_event_element_${item.id}`).scrollIntoView()
+        })
+    })
+}
 // Builds a new HTML "li" element for the to do list
 function makeEventElement(item) {
     let startdate = new Date(`${item.startDate}`)
@@ -96,16 +118,34 @@ function makeEventElement(item) {
 
     let enddate = new Date(`${item.endDate}`)
     enddate = enddate.toLocaleDateString('en-us') + " " + enddate.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-
     let details = `
-        <div class="event" id="id_event_element_${item.id}">
-        <p> ${startdate} </p>
+        <div class="event" id="id_event_element_${item.id}">    
+            <p> ${startdate} </p>
         </div>
     `
+
+    if (item.user == current_user) {
+        details += `
+        <button type="button" id="id_event_delete_${item.id}" onclick="deleteEvent(${item.id})">X</button>
+        `
+    }
+
     let element = document.createElement("div")
     element.innerHTML = `${details}`
 
     return element
+}
+
+function deleteEvent(event_id) {
+    let xhr = new XMLHttpRequest()
+    xhr.onreadystatechange = function() {
+        if (xhr.readyState !== 4) return
+        updatePage(xhr, true)
+    }
+
+    xhr.open("POST", `/scottysnacc/delete-event/${event_id}`, true)
+    xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded")
+    xhr.send(`csrfmiddlewaretoken=${getCSRFToken()}`)
 }
 
 function addEvent() {
@@ -152,7 +192,7 @@ function addEvent() {
             let xhr = new XMLHttpRequest()
             xhr.onreadystatechange = function() {
                 if (xhr.readyState !== 4) return
-                updatePage(xhr)
+                updatePage(xhr, false)
             }
             xhr.open("POST", `/scottysnacc/add-event`, true)
             xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded")
