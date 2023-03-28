@@ -3,13 +3,16 @@ let map;
 function initMap() {
     let CMU = {lat: 40.443336, lng: -79.944023};
     map = new google.maps.Map(
-        document.getElementById('map'), {zoom: 15, center: CMU}
+        document.getElementById('map'), {
+            zoom: 15,
+            center: CMU,
+            disableDefaultUI: true,
+        }
     )
 }
 
 function setUpSearch() {
     let building = document.getElementById("id_building_location_input_text");
-    // building = document.querySelector("#id_building_location_input_text");
     let options = {
         componentRestrictions: { country: "us" },
         fields: ["address_components"],
@@ -63,6 +66,11 @@ function updatePage(xhr) {
 function displayError() {
 }
 
+function showSelectedEvent(event_id) {
+    let eventElement = document.getElementById(`id_event_element_${event_id}`)
+    console.log("HII")
+}
+
 function updateEventList(items) {
     // Removes all existing to-do list items
     let div = document.getElementById("event_block")
@@ -75,6 +83,9 @@ function updateEventList(items) {
             div.prepend(makeEventElement(item))
             let location = {lat: Number(item.lat), lng: Number(item.lng)}
             let marker = new google.maps.Marker({position: location, map: map})
+            marker.addListener("click", () => {
+                let eventElement = document.getElementById(`id_event_element_${item.id}`).scrollIntoView()
+            })
         }
     });
 }
@@ -82,6 +93,9 @@ function updateEventList(items) {
 function makeEventElement(item) {
     let startdate = new Date(`${item.startDate}`)
     startdate = startdate.toLocaleDateString('en-us') + " " + startdate.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+
+    let enddate = new Date(`${item.endDate}`)
+    enddate = enddate.toLocaleDateString('en-us') + " " + enddate.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
 
     let details = `
         <div class="event" id="id_event_element_${item.id}">
