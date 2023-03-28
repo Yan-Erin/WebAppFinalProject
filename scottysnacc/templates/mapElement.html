@@ -9,16 +9,7 @@
 {% block map-ui %}
 <body>
     <div id="map"></div>
-    <script>
-        function initMap() {
-            let CMU = {lat: 40.443336, lng: -79.944023};
-            let map = new google.maps.Map(
-                document.getElementById('map'), {zoom: 15, center: CMU}
-            )
-            let marker = new google.maps.Marker({position: CMU, map: map})
-        }
-    </script>
-    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAz_8eAQta7W3gX5XwBswQDeNo2TmLCPXI&callback=initMap"></script>
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAz_8eAQta7W3gX5XwBswQDeNo2TmLCPXI&libraries=places&callback=initMap"></script>
     <div id="id_new_event"></div>
     <button onclick="makeNewEventBlock()">+</button>
     <div id="event_block">

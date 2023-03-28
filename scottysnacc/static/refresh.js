@@ -1,4 +1,45 @@
 "use strict"
+let building;
+let autocomplete;
+function initMap() {
+    let CMU = {lat: 40.443336, lng: -79.944023};
+    let map = new google.maps.Map(
+        document.getElementById('map'), {zoom: 15, center: CMU}
+    )
+    let marker = new google.maps.Marker({position: CMU, map: map})
+}
+
+function setUpSearch() {
+    building = document.querySelector("#id_building_location_input_text");
+    let options = {
+        componentRestrictions: { country: "us" },
+        fields: ["address_components"],
+      };
+    autocomplete = new google.maps.places.Autocomplete(building, options);
+    autocomplete.addListener("place_changed", fillInAddress);
+}
+
+function fillInAddress() {
+    let place = autocomplete.getPlace();
+    let address = "";
+    for (const component of place.address_components) {
+        // @ts-ignore remove once typings fixed
+        const componentType = component.types[0];
+    
+        switch (componentType) {
+          case "street_number": {
+            address = `${component.long_name} ${address}`;
+            break;
+          }
+    
+          case "route": {
+            address += component.short_name;
+            break;
+          }
+        }
+    }
+    building.value = address;
+}
 
 // Sends a new request to update the to-do list
 function getEvent() {
@@ -160,6 +201,7 @@ function makeNewEventBlock() {
     let element= document.createElement("div");
     element.innerHTML = `${details}`;
     elemet.prepend(element);
+    setUpSearch();
     return null
 }
 
