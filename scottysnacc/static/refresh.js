@@ -229,7 +229,7 @@ function makeNewEventBlock() {
             </div>
             
             <div class='form-group event-form'>
-                <button class="close-btn" onclick="closeEvent()">X</button>
+                <button class="close-btn" onclick="closeEvent()">x</button>
                 <label>Event Name</label>
                 <input type="text" name="name"  class="form-control" id="id_name_input_text"/>
 

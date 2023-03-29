@@ -72,15 +72,16 @@ h2 {
 }
 
 .close-btn {
-    width: 3rem;
+    width: 2.7rem;
     display: block;
-    height: 3rem;
+    height: 2.7rem;
     border-radius: 5rem;
     font-size: 2rem;
     text-align: center;
     background-color: #A4161A;
     color:#E2DFEC; 
     margin-left:90%;
+    font-size: 1.3rem;
 }
 .close-btn:hover, .btn-circle:hover {
     background-color:#671011;
@@ -135,6 +136,7 @@ h2 {
     width:30rem;
     overflow-y:auto;
     max-height: 90vh;
+    scrollbar-color: #A4161A;
 }
 .right-header {
     font-size: 2rem;
