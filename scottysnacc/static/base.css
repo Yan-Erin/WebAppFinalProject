@@ -133,6 +133,8 @@ h2 {
 #event_block {
     flex:1;
     width:30rem;
+    overflow-y:auto;
+    max-height: 90vh;
 }
 .right-header {
     font-size: 2rem;
