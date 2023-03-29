@@ -120,7 +120,10 @@ function makeEventElement(item) {
     enddate = enddate.toLocaleDateString('en-us') + " " + enddate.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
     let details = `
         <div class="event" id="id_event_element_${item.id}">    
-            <p> ${startdate} </p>
+            <p class="event-title">${item.name}</p>
+            <p class="event-loc">${item.building}</p>
+            <p class="event-start"> ${startdate} - ${enddate} </p>
+
         </div>
     `
 
@@ -203,10 +206,13 @@ function addEvent() {
 }
 function closeEvent() {
     var x = document.getElementById("new-event-block");
+    var btn = document.getElementById("new-event-btn")
     if (x.style.display === "none") {
       x.style.display = "block";
+      btn.style.display = "none";
     } else {
       x.style.display = "none";
+      btn.style.display = "block";
     }
 }
 
@@ -255,6 +261,8 @@ function makeNewEventBlock() {
     elemet.prepend(element);
     setUpSearch();
     setUpDateTime();
+    var btn = document.getElementById("new-event-btn")
+    btn.style.display = "none";
     return null
 }
 
