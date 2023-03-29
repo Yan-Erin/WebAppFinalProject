@@ -2,6 +2,8 @@ body {
     background-color: #F5F3F4;
     font-family: 'Inter', sans-serif;
     color:#212427;
+    height: 100vh;
+    width: 100vw;
 }
 h2 {
     color:#A4161A;
@@ -61,7 +63,7 @@ h2 {
     text-align: center;
     background-color: #A4161A;
     color:#E2DFEC;
-    margin-top:-10vh;
+    margin-top:-15vh;
     margin-left:2vw;
     z-index: 1;
 }
@@ -94,6 +96,7 @@ h2 {
 .map_page {
     display: flex;
     width: 100vw;
+    height:100%
 }
 .map_newevent {
     flex: 1;
@@ -177,5 +180,5 @@ h2 {
 
 #map {
     width: 100%;
-    height: 93vh;
+    height: 100%;
 }
