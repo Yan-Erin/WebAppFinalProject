@@ -23,12 +23,10 @@ h2 {
 .event-title {
     font-size: 1.75rem;
 }
-.event-loc {
+.event-loc{
     color:#A4161A;
     font-size: 0.9rem;
-}
-.event-start {
-    font-size: 0.9rem;;
+    
 }
 .logout_button, #id_register_button, #id_login_button{
     background-color: #A4161A;
@@ -51,8 +49,8 @@ h2 {
   }
 #login_maindiv, #register_maindiv {
     display: grid;
-    grid-template-columns: 5rem 3fr 1fr;
-    grid-gap: 10px;
+    grid-template-columns: 1fr 1fr;
+    grid-gap: 20px;
 }
 .btn-circle {
     position:absolute;
@@ -110,7 +108,7 @@ h2 {
     border-radius: 3rem;
     width:85vw;
     height:75vh;
-    margin-top:-80vh;
+    margin-top:-85vh;
     margin-left:5vw;
     position: absolute;
     z-index: 2;
