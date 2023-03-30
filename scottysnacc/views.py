@@ -12,6 +12,7 @@ import json
 from scottysnacc import models
 from datetime import datetime
 from django.core.exceptions import ObjectDoesNotExist
+import pytz
 
 @login_required
 def map_action(request):
@@ -121,14 +122,16 @@ def add_action(request):
         'id': event.id,
     }]
 
-    response_data = {'events': event_data}
+    if event.enddate.replace(tzinfo=pytz.UTC) > timezone.datetime.now().replace(tzinfo=pytz.timezone('US/Eastern')):
+        response_data = {'active_events': event_data, 'inactive_events': []}
+    else:
+        response_data = {'active_events': [], 'inactive_events': event_data}
 
     response_json = json.dumps(response_data)
 
     return HttpResponse(response_json, content_type='application/json')
 
 def delete_action(request, event_id):
-    print("im here")
     if not request.user.is_authenticated:
         return _my_json_error_response("You must be logged in to do this operation", status=401)
 
@@ -151,24 +154,28 @@ def get_events_json_dumps_serializer(request):
     if not request.user.is_authenticated:
         return _my_json_error_response("Not logged-in.", status=401)
     
-    event_data = []
+    active_event_data = []
+    inactive_event_data = []
     for event in models.Event.objects.all():
-        event = {
-        'user': event.user.id,
-        'name': event.name,
-        'lng': event.lng,
-        'lat': event.lat,
-        'building': event.building,
-        'description': event.description,
-        'specLocation': event.specLocation,
-        'startDate': str(event.startdate),
-        'endDate': str(event.enddate),
-        'tag': event.tag,
-        'id': event.id,
-    }
-        event_data.append(event)
-    
-    response_data = {'events' : event_data}
+        e = {
+            'user': event.user.id,
+            'name': event.name,
+            'lng': event.lng,
+            'lat': event.lat,
+            'building': event.building,
+            'description': event.description,
+            'specLocation': event.specLocation,
+            'startDate': str(event.startdate),
+            'endDate': str(event.enddate),
+            'tag': event.tag,
+            'id': event.id,
+            }
+        if event.enddate.replace(tzinfo=pytz.UTC) > timezone.datetime.now().replace(tzinfo=pytz.timezone('US/Eastern')):
+            active_event_data.append(e)
+        else:
+            inactive_event_data.append(e)
+            
+    response_data = {'active_events' : active_event_data, 'inactive_events' : inactive_event_data}
 
     response_json = json.dumps(response_data)
 

@@ -42,9 +42,9 @@ function updatePage(xhr, isDelete) {
     if (xhr.status === 200) {
         let response = JSON.parse(xhr.responseText)
         if (isDelete) {
-            updateDeletedEventList(response["events"])
+            updateDeletedEventList(response["active_events"], response["inactive_events"])
         } else {
-            updateEventList(response["events"])
+            updateEventList(response["active_events"], response["inactive_events"])
         }
         
         return
@@ -76,12 +76,25 @@ function showSelectedEvent(event_id) {
     console.log("HII")
 }
 
-function updateEventList(items) {
+function updateEventList(active_items, inactive_items) {
     // Removes all existing to-do list items
     let div = document.getElementById("event_block")
    
     // Adds each to do list item received from the server to the displayed list
-    items.forEach(item => {
+    active_items.forEach(item => {
+        // Check if item already exists on the page
+        if (document.getElementById(`id_event_element_${item.id}`) == null) {
+            //If not, add a new list item element
+            div.prepend(makeEventElement(item))
+            let location = {lat: Number(item.lat), lng: Number(item.lng)}
+            let marker = new google.maps.Marker({position: location, map: map})
+            marker.addListener("click", () => {
+                let eventElement = document.getElementById(`id_event_element_${item.id}`)
+            })
+        }
+    });
+    //TODO STYLING FOR PAST EVENTS
+    inactive_items.forEach(item => {
         // Check if item already exists on the page
         if (document.getElementById(`id_event_element_${item.id}`) == null) {
             //If not, add a new list item element
@@ -95,14 +108,23 @@ function updateEventList(items) {
     });
 }
 
-function updateDeletedEventList(items) {
+function updateDeletedEventList(active_items, inactive_items) {
     let div = document.getElementById("event_block")
 
     while (div.hasChildNodes()) {
         div.firstChild.remove()
     }
 
-    items.forEach(item => {
+    active_items.forEach(item => {
+        div.prepend(makeEventElement(item))
+        let location = {lat: Number(item.lat), lng: Number(item.lng)}
+        let marker = new google.maps.Marker({position: location, map: map})
+        marker.addListener("click", () => {
+            let eventElement = document.getElementById(`id_event_element_${item.id}`).scrollIntoView()
+        })
+    })
+    //TODO STYLING FOR PAST EVENTS
+    inactive_items.forEach(item => {
         div.prepend(makeEventElement(item))
         let location = {lat: Number(item.lat), lng: Number(item.lng)}
         let marker = new google.maps.Marker({position: location, map: map})
