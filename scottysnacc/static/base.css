@@ -99,7 +99,7 @@ h2 {
     height:100%
 }
 .map_newevent {
-    flex: 1;
+    flex: 2;
 }
 .event-form {
     flex: 1;
