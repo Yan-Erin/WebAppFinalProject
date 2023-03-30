@@ -8,3 +8,4 @@ my_env
 scottysnacc/config.ini
 *.ini
 db.sqlite3
+node_modules

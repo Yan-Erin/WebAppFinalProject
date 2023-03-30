@@ -82,7 +82,7 @@ h2 {
     text-align: center;
     background-color: #A4161A;
     color:#E2DFEC; 
-    margin-left:90%;
+    margin-top: -20%;
     font-size: 1.3rem;
 }
 .close-btn:hover, .btn-circle:hover {
@@ -103,6 +103,12 @@ h2 {
 }
 .event-form {
     flex: 1;
+}
+.form-group {
+    max-height: 100%;
+}
+.form-control {
+    margin-bottom: 0.4rem;;
 }
 #new-event-block {
     background-color: #F5F3F4;
