@@ -108,28 +108,7 @@ def add_action(request):
 
     event.save()
 
-    event_data = [{
-        'user': event.user.id,
-        'name': event.name,
-        'lng': event.lng,
-        'lat': event.lat,
-        'building': event.building,
-        'description': event.description,
-        'specLocation': event.specLocation,
-        'startDate': str(event.startdate),
-        'endDate': str(event.enddate),
-        'tag': event.tag,
-        'id': event.id,
-    }]
-
-    if event.enddate.replace(tzinfo=pytz.UTC) > timezone.datetime.now().replace(tzinfo=pytz.timezone('US/Eastern')):
-        response_data = {'active_events': event_data, 'inactive_events': []}
-    else:
-        response_data = {'active_events': [], 'inactive_events': event_data}
-
-    response_json = json.dumps(response_data)
-
-    return HttpResponse(response_json, content_type='application/json')
+    return get_events_json_dumps_serializer(request)
 
 def delete_action(request, event_id):
     if not request.user.is_authenticated:
