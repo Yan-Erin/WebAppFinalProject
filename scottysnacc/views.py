@@ -135,7 +135,7 @@ def get_events_json_dumps_serializer(request):
     
     active_event_data = []
     inactive_event_data = []
-    for event in models.Event.objects.all():
+    for event in models.Event.objects.all().order_by('startdate'):
         e = {
             'user': event.user.id,
             'name': event.name,
