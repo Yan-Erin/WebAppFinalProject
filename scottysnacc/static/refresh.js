@@ -1,5 +1,6 @@
 "use strict"
 let map;
+let autocomplete;
 function initMap() {
     let CMU = {lat: 40.443336, lng: -79.944023};
     map = new google.maps.Map(
@@ -15,9 +16,9 @@ function setUpSearch() {
     let building = document.getElementById("id_building_location_input_text");
     let options = {
         componentRestrictions: { country: "us" },
-        fields: ["address_components"],
+        fields: ["address_components", "name"],
       };
-    let autocomplete = new google.maps.places.Autocomplete(building, options);
+    autocomplete = new google.maps.places.Autocomplete(building, options);
 }
 
 function setUpDateTime() {
@@ -78,8 +79,8 @@ function updateEventList(active_items, inactive_items) {
     while (div.hasChildNodes()) {
         div.firstChild.remove()
     }
-
-    active_items.forEach(item => {
+    //TODO STYLING FOR PAST EVENTS
+    inactive_items.forEach(item => {
         div.prepend(makeEventElement(item))
         let location = {lat: Number(item.lat), lng: Number(item.lng)}
         let marker = new google.maps.Marker({position: location, map: map})
@@ -87,8 +88,8 @@ function updateEventList(active_items, inactive_items) {
             let eventElement = document.getElementById(`id_event_element_${item.id}`).scrollIntoView()
         })
     })
-    //TODO STYLING FOR PAST EVENTS
-    inactive_items.forEach(item => {
+
+    active_items.forEach(item => {
         div.prepend(makeEventElement(item))
         let location = {lat: Number(item.lat), lng: Number(item.lng)}
         let marker = new google.maps.Marker({position: location, map: map})
@@ -107,9 +108,10 @@ function makeEventElement(item) {
     let details = `
         <div class="event" id="id_event_element_${item.id}">    
             <p class="event-title">${item.name}</p>
-            <p class="event-loc">${item.building}</p>
-            <p class="event-start"> ${startdate} - ${enddate} </p>
-
+            <p class="event-loc">${item.building} ${item.specLocation}</p>
+            <p class="event-start">${startdate} - ${enddate}</p>
+            <p class="event-description">${item.description}</p>
+            <p class="event-tags">${item.tag}</p>
         </div>
     `
 
@@ -158,8 +160,10 @@ function checkEventForm (context) {
 function addEvent() {
     let eventNameElement = document.getElementById("id_name_input_text")
     let eventNameValue = eventNameElement.value
-    let buildingElement = document.getElementById("id_building_location_input_text")
-    let buildingValue = buildingElement.value
+
+    let place = autocomplete.getPlace();
+
+    let buildingValue = place.name;
 
     let geocoder = new google.maps.Geocoder();
 
@@ -178,8 +182,67 @@ function addEvent() {
     let endTimeElement = document.getElementById("id_end_time_input_text")
     let endTimeValue = endTimeElement.value
 
-    let tagElement = document.getElementById("id_tag_input_text")
-    let tagValue = tagElement.value
+    let tags = " "
+
+    let allElement = document.getElementById("tag_all")
+    let allValue = allElement.value
+    if (allValue == "on") {
+        tags += "All "
+    }
+
+    let undergradElement = document.getElementById("tag_undergrad")
+    let undergradValue = undergradElement.value
+    if (undergradValue == "on") {
+        tags += "Undergraduate "
+    }
+
+    let graduateElement = document.getElementById("tag_graduate")
+    let graduateValue = graduateElement.value
+    if (graduateValue == "on") {
+        tags += "Graduate "
+    }
+
+    let CFAElement = document.getElementById("tag_CFA")
+    let CFAValue = CFAElement.value
+    if (CFAValue == "on") {
+        tags += "CFA "
+    }
+
+    let CITElement = document.getElementById("tag_CIT")
+    let CITValue = CITElement.value
+    if (CITValue == "on") {
+        tags += "CIT "
+    }
+
+    let DCElement = document.getElementById("tag_DC")
+    let DCValue = DCElement.value
+    if (DCValue == "on") {
+        tags += "DC "
+    }
+
+    let MCSElement = document.getElementById("tag_MCS")
+    let MCSValue = MCSElement.value
+    if (MCSValue == "on") {
+        tags += "MCS "
+    }
+
+    let SCSElement = document.getElementById("tag_SCS")
+    let SCSValue = SCSElement.value
+    if (SCSValue == "on") {
+        tags += "SCS "
+    }
+
+    let TPRElement = document.getElementById("tag_TPR")
+    let TPRValue = TPRElement.value
+    if (TPRValue == "on") {
+        tags += "TPR "
+    }
+
+    let HNZElement = document.getElementById("tag_HNZ")
+    let HNZValue = HNZElement.value
+    if (HNZValue == "on") {
+        tags += "HNZ "
+    }
 
     var context = {"eventNameValue": eventNameValue,
                "buildingValue": buildingValue,
@@ -194,13 +257,6 @@ function addEvent() {
         var btn = document.getElementById("new-event-btn")
         btn.style.display = "block";
     }
-    eventNameElement.value = ''
-    buildingElement.value = ''
-    descriptionElement.value = ''
-    specLocationElement.value = ''
-    startTimeElement.value = ''
-    endTimeElement.value = ''
-    tagElement.value = ''
 
     geocoder.geocode( {'address': buildingValue}, function(results, status) {
         //TODO error handling
@@ -216,7 +272,7 @@ function addEvent() {
             }
             xhr.open("POST", `/scottysnacc/add-event`, true)
             xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded")
-            xhr.send(`event_name=${eventNameValue}&lng=${lng}&lat=${lat}&building=${buildingValue}&description=${descriptionValue}&specLocation=${specLocationValue}&start=${startTimeValue}&end=${endTimeValue}&tag=${tagValue}&csrfmiddlewaretoken=${getCSRFToken()}`)
+            xhr.send(`event_name=${eventNameValue}&lng=${lng}&lat=${lat}&building=${buildingValue}&description=${descriptionValue}&specLocation=${specLocationValue}&start=${startTimeValue}&end=${endTimeValue}&tag=${tags}&csrfmiddlewaretoken=${getCSRFToken()}`)
             
         }
     });
@@ -282,8 +338,17 @@ function makeNewEventBlock() {
                 <label><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-tag" viewBox="0 0 16 16">
                 <path d="M6 4.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm-1 0a.5.5 0 1 0-1 0 .5.5 0 0 0 1 0z"/>
                 <path d="M2 1h4.586a1 1 0 0 1 .707.293l7 7a1 1 0 0 1 0 1.414l-4.586 4.586a1 1 0 0 1-1.414 0l-7-7A1 1 0 0 1 1 6.586V2a1 1 0 0 1 1-1zm0 5.586 7 7L13.586 9l-7-7H2v4.586z"/>
-                </svg>  Tags</label>
-                <input type="text" name="tags" class="form-control" id="id_tag_input_text"/>
+                </svg>  Tags</label><br>
+                <input type="checkbox" name="tags" id="tag_all"> All 
+                <input type="checkbox" name="tags" id="tag_undergrad"> Undergraduate 
+                <input type="checkbox" name="tags" id="tag_graduate"> Graduate <br>
+                <input type="checkbox" name="tags" id="tag_CFA"> CFA 
+                <input type="checkbox" name="tags" id="tag_CIT"> CIT 
+                <input type="checkbox" name="tags" id="tag_DC"> DC 
+                <input type="checkbox" name="tags" id="tag_MCS"> MCS 
+                <input type="checkbox" name="tags" id="tag_SCS"> SCS 
+                <input type="checkbox" name="tags" id="tag_TPR"> TPR 
+                <input type="checkbox" name="tags" id="tag_HNZ"> HNZ <br>
 
                 <button  id='event-submit' class='btn-default' onclick="addEvent()">Submit</button>
             </div>
