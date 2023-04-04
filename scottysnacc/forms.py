@@ -46,6 +46,12 @@ class RegisterForm(forms.Form):
         # of cleaned data as a result
         cleaned_data = super().clean()
 
+        # Confirms that the username is not already present in the
+        # User model database.
+        email = self.cleaned_data.get('email')
+        if User.objects.filter(username__exact=email):
+            raise forms.ValidationError("Username is already taken.")
+
         # Confirms that the two password fields match
         password1 = cleaned_data.get('password1')
         password2 = cleaned_data.get('password2')
@@ -54,15 +60,3 @@ class RegisterForm(forms.Form):
 
         # We must return the cleaned data we got from our parent.
         return cleaned_data
-
-    # Customizes form validation for the username field.
-    def clean_username(self):
-        # Confirms that the username is not already present in the
-        # User model database.
-        email = self.cleaned_data.get('email')
-        if User.objects.filter(username__exact=email):
-            raise forms.ValidationError("Username is already taken.")
-
-        # We must return the cleaned data we got from the cleaned_data
-        # dictionary
-        return email
