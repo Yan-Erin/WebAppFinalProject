@@ -51,29 +51,35 @@ function updatePage(xhr) {
     }
 
     if (xhr.status === 0) {
-        displayError("Cannot connect to server")
+        displayError("Cannot connect to server", false)
         return
     }
 
     if (!xhr.getResponseHeader('content-type') === 'application/json') {
-        displayError(`Received status = ${xhr.status}`)
+        displayError(`Received status = ${xhr.status}`, false)
         return
     }
 
     let response = JSON.parse(xhr.responseText)
     if (response.hasOwnProperty('error')) {
-        displayError(response.error)
+        displayError(response.error, false)
         return
     }
 
 }
-//TODO
-function displayError() {
-}
 
+function displayError(message, isForm) {
+    let errorElement
+    if (isForm) {
+        errorElement = document.getElementById("form_error")
+    } else {
+        errorElement = document.getElementById("update_error")
+    }
+    errorElement.innerHTML = message
+}
+//TODO
 function showSelectedEvent(event_id) {
     let eventElement = document.getElementById(`id_event_element_${event_id}`)
-    console.log("HII")
 }
 
 function updateEventList(active_items, inactive_items) {
@@ -178,14 +184,34 @@ function unlikeEvent(event_id) {
 }
 
 function checkEventForm (context) {
-    if (context["eventNameValue"] == "" || context["buildingValue"] == "") {
-        console.log("1")
+    if (context["eventNameValue"] == "") {
+        displayError("Please enter event name", true)
         return false;
     }
-    if (context["startTimeValue"] == "" || context["endTimeValue"]== ""){
-        console.log("2")
+    if (context["buildingValue"] == "") {
+        displayError("Please enter event location", true)
         return false;
     }
+    if (context["startTimeValue"] == "") {
+        displayError("Please enter event start time", true)
+        return false;
+    }
+    if (context["endTimeValue"] == "") {
+        displayError("Please enter event end time", true)
+        return false;
+    }
+    let startDate = new Date(context["startTimeValue"])
+    let endDate = new Date(context["endTimeValue"])
+
+    if (startDate >= endDate) {
+        displayError("Event start time cannot be later than end time", true)
+        return false;
+    }
+    if (context["tags"] == "") {
+        displayError("Please select event tags", true)
+        return false;
+    }
+
     return true;
 }
 
@@ -193,10 +219,20 @@ function addEvent() {
     let eventNameElement = document.getElementById("id_name_input_text")
     let eventNameValue = eventNameElement.value
 
-    let place = autocomplete.getPlace();
-    let buildingName = place.name
+    
     let buildingElement = document.getElementById('id_building_location_input_text')
     let buildingAddr = buildingElement.value
+
+    let buildingName = ""
+    let place = autocomplete.getPlace();
+
+    if (place != null) {   
+        buildingName = place.name
+    }
+    else {
+        displayError("Please select an event location from the recommended list", true)
+        return
+    }
 
     let geocoder = new google.maps.Geocoder();
 
@@ -270,9 +306,10 @@ function addEvent() {
     var context = {"eventNameValue": eventNameValue,
                "buildingValue": buildingAddr,
                "startTimeValue": startTimeValue,
-               "endTimeValue": endTimeElement
+               "endTimeValue": endTimeValue,
+               "tagValue": tags
             }
-    
+
     if (checkEventForm(context)) {
         geocoder.geocode( {'address': buildingAddr}, function(results, status) {
             //TODO error handling
@@ -296,11 +333,9 @@ function addEvent() {
                 xhr.send(`event_name=${eventNameValue}&lng=${lng}&lat=${lat}&buildingAddr=${buildingAddr}&buildingName=${buildingName}&description=${descriptionValue}&specLocation=${specLocationValue}&start=${startTimeValue}&end=${endTimeValue}&tag=${tags}&csrfmiddlewaretoken=${getCSRFToken()}`)
             }
             else {
-                console.log("GEOCODER FAILURE")
+                displayError("Cannot geocode the event location", true)
             }
         });
-
-        
     }
 }
 function closeEvent() {
@@ -375,6 +410,7 @@ function makeNewEventBlock() {
                 <input type="checkbox" name="tags" id="tag_SCS"> SCS 
                 <input type="checkbox" name="tags" id="tag_TPR"> TPR 
                 <input type="checkbox" name="tags" id="tag_HNZ"> HNZ <br>
+                <div id="form_error"></div>
                 <button  id='event-submit' class='btn-default' onclick="addEvent()">Submit</button>
             </div>
             </div>
