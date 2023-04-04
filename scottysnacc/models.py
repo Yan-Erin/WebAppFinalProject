@@ -1,5 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
+from allauth.account.signals import user_signed_up
+from django.dispatch import receiver
 
 class Event(models.Model):
     user = models.ForeignKey(User, default=None, on_delete=models.PROTECT)
@@ -23,5 +25,9 @@ class Profile(models.Model):
 
     def __str__(self):
         return f'id={self.id}, user={self.user}'
-    
 
+def get_or_create_user_profile(user):
+    profile, created = Profile.objects.get_or_create(user=user)
+    if created:
+        profile.save()
+    return profile

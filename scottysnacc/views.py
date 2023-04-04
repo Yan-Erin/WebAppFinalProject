@@ -87,6 +87,12 @@ def register_action(request):
     login(request, new_user)
     return redirect(reverse('home'))
 
+def get_or_create_user_profile(user):
+    profile, created = Profile.objects.get_or_create(user=user)
+    if created:
+        profile.save()
+    return profile
+
 def add_action(request):
     #TODO more error handling
     if not request.user.is_authenticated:
@@ -140,11 +146,9 @@ def like_action(request, event_id):
 
     if request.method != 'POST':
         return _my_json_error_response("You must use a POST request for this operation", status=405)
-    
     event_to_like = get_object_or_404(Event, id=event_id)
-    #FIFURE OUT OAUTH CONNECTION BETWEEN USER AND PROFILE
-    request.user.profile.liked_events.add(event_to_like)
-    request.user.profile.save()
+    profile = get_or_create_user_profile(request.user)
+    profile.liked_events.add(event_to_like)
 
     return get_events_json_dumps_serializer(request)
 
@@ -165,7 +169,8 @@ def unlike_action(request, event_id):
 def get_events_json_dumps_serializer(request):
     if not request.user.is_authenticated:
         return _my_json_error_response("Not logged-in.", status=401)
-    
+
+    liked_event_data = [] 
     active_event_data = []
     inactive_event_data = []
     for event in models.Event.objects.all().order_by('startdate'):
@@ -183,15 +188,22 @@ def get_events_json_dumps_serializer(request):
             'tag': event.tag,
             'id': event.id,
             }
-        if event.enddate.replace(tzinfo=pytz.UTC) > timezone.datetime.now().replace(tzinfo=pytz.timezone('US/Eastern')):
+        print(request)
+        liked_events=[]
+        profile = get_or_create_user_profile(request.user)
+        liked_events =  profile.liked_events
+
+        if event in liked_events.all():
+            liked_event_data.append(e)
+        elif event.enddate.replace(tzinfo=pytz.UTC) > timezone.datetime.now().replace(tzinfo=pytz.timezone('US/Eastern')):
             active_event_data.append(e)
         else:
             inactive_event_data.append(e)
             
-    response_data = {'active_events' : active_event_data, 'inactive_events' : inactive_event_data}
+    response_data = {"liked_events": liked_event_data, 'active_events' : active_event_data, 'inactive_events' : inactive_event_data}
 
     response_json = json.dumps(response_data)
-
+    print(liked_events)
     return HttpResponse(response_json, content_type='application/json')
 
 
