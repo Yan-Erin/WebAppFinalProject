@@ -35,7 +35,7 @@ def login_action(request):
     if not form.is_valid():
         return render(request, 'login.html', context)
 
-    new_user = authenticate(username=form.cleaned_data['email'],
+    new_user = authenticate(username=form.cleaned_data['username'],
                             password=form.cleaned_data['password'])
 
     login(request, new_user)
@@ -68,7 +68,8 @@ def register_action(request):
         return render(request, 'register.html', context)
 
     # At this point, the form data is valid.  Register and login the user.
-    new_user = User.objects.create_user(username=form.cleaned_data['email'],
+    new_user = User.objects.create_user(email=form.cleaned_data['email'],
+                                        username=form.cleaned_data['username'],
                                         password=form.cleaned_data['password1'])
 
     new_user.save()
@@ -77,7 +78,7 @@ def register_action(request):
     profile.user = new_user
     profile.save()
 
-    new_user = authenticate(username=form.cleaned_data['email'],
+    new_user = authenticate(username=form.cleaned_data['username'],
                             password=form.cleaned_data['password1'])
 
     login(request, new_user)
@@ -86,13 +87,13 @@ def register_action(request):
 def add_action(request):
     #TODO more error handling
     if not request.user.is_authenticated:
-        return _my_json_error_response("Not logged-in.", status=401)
+        return _my_json_error_response("Not logged-in", status=401)
     
     if request.method == 'GET':
-        return _my_json_error_response("Invalid GET request.", status=405)
+        return _my_json_error_response("Invalid GET request", status=405)
 
     if 'event_name' not in request.POST or not request.POST['event_name']:
-        return _my_json_error_response("You must enter event name.", status=400)
+        return _my_json_error_response("You must enter event name", status=400)
     
     event = models.Event()
     event.user = request.user
@@ -121,7 +122,7 @@ def delete_action(request, event_id):
     try:
         event = models.Event.objects.get(id=event_id)
     except ObjectDoesNotExist:
-        return _my_json_error_response(f"Item with id={event_id} does not exist.", status=404)
+        return _my_json_error_response(f"Item with id={event_id} does not exist", status=404)
 
     if request.user != event.user:
         return _my_json_error_response("You cannot delete other user's entries", status=403)

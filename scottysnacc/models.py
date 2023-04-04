@@ -19,7 +19,6 @@ class Event(models.Model):
     
 class Profile(models.Model):
     user = models.OneToOneField(User, default=None, on_delete=models.PROTECT, related_name="profile")
-    picture = models.FileField(blank=True)
     liked_events  = models.ManyToManyField(Event)
 
     def __str__(self):
