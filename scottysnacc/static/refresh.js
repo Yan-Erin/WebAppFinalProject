@@ -117,16 +117,22 @@ function makeEventElement(item) {
 
     let deleteButton
     if (item.user == current_user) {
-        deleteButton = `<button type="button" class="delete_button" id="id_event_delete_${item.id}" onclick="deleteEvent(${item.id})">X</button>`
+        deleteButton = `<button type="button" class="btn delete_button" id="id_event_delete_${item.id}" onclick="deleteEvent(${item.id})">X</button>`
     } else {
         deleteButton = "<button style='visibility: hidden'>X</button> "
     }
 
     let likeButton
     if (liked_events.includes(`id=${item.id},`)) {
-        likeButton = `<button type="button" class="like_button" id="id_event_like_${item.id}" onclick="unlikeEvent(${item.id})">Unlike</button>`
+        likeButton = `<button type="button" class="btn like_button" id="id_event_like_${item.id}" onclick="unlikeEvent(${item.id})">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-heart" viewBox="0 0 16 16">
+        <path d="m8 2.748-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01L8 2.748zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143c.06.055.119.112.176.171a3.12 3.12 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15z"/>
+      </svg>  Unlike</button>`
     } else {
-        likeButton = `<button type="button" class="like_button" id="id_event_like_${item.id}" onclick="likeEvent(${item.id})">Like</button>`
+        likeButton = `<button type="button" class=" btn like_button" id="id_event_like_${item.id}" onclick="likeEvent(${item.id})">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-heart" viewBox="0 0 16 16">
+  <path d="m8 2.748-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01L8 2.748zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143c.06.055.119.112.176.171a3.12 3.12 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15z"/>
+</svg>  Like</button>`
     }
 
     let details = `
@@ -135,8 +141,8 @@ function makeEventElement(item) {
             <p class="event-title">${item.name}</p>
             <p class="event-loc">${item.buildingName} ${item.specLocation}</p>
             <p class="event-start">${startdate} - ${enddate}</p>
-            <p class="event-description">${item.description}</p>
-            <p class="event-tags">${item.tag}</p>
+            <p class="event-description"><u>Description:</u> ${item.description}</p>
+            <p class="event-tags"><u>Tags:</u> ${item.tag.trim().split(" ").join(", ")}</p> 
             ${likeButton}
         </div>
     `

@@ -190,4 +190,12 @@ h2 {
 }
 .delete_button {
     float: right;
+    border-radius: 20px;
+    background-color: #A4161A;
+    color:#D9D9D9;
+}
+.like_button {
+    border-color: #a7a5a5;
+    border-width: 0.1em;
+    border-radius: 10px;
 }
