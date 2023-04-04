@@ -15,7 +15,7 @@ class Event(models.Model):
     startdate = models.DateTimeField()
     enddate = models.DateTimeField()
     tag = models.CharField(max_length=200)
-
+    likeCount = models.PositiveIntegerField(default=0)
     def __str__(self):
         return f'id={self.id}, user={self.user}, name={self.name}'
     

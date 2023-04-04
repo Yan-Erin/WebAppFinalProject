@@ -149,8 +149,11 @@ def like_action(request, event_id):
     event_to_like = get_object_or_404(Event, id=event_id)
     profile = get_or_create_user_profile(request.user)
     profile.liked_events.add(event_to_like)
-
-    return get_events_json_dumps_serializer(request)
+    event_to_like.likeCount +=1
+    event_to_like.save() 
+    temp = get_events_json_dumps_serializer(request)
+    temp["like_count"] = event_to_like.likeCount
+    return temp
 
 def unlike_action(request, event_id):
     if not request.user.is_authenticated:
@@ -160,11 +163,14 @@ def unlike_action(request, event_id):
         return _my_json_error_response("You must use a POST request for this operation", status=405)
     
     event_to_unlike = get_object_or_404(Event, id=event_id)
+    event_to_unlike.likeCount-=1
+    event_to_unlike.save() 
     #FIFURE OUT OAUTH CONNECTION BETWEEN USER AND PROFILE
     request.user.profile.liked_events.remove(event_to_unlike)
     request.user.profile.save()
-
-    return get_events_json_dumps_serializer(request)
+    temp = get_events_json_dumps_serializer(request)
+    temp["like_count"] = event_to_unlike.likeCount
+    return temp
 
 def get_events_json_dumps_serializer(request):
     if not request.user.is_authenticated:
@@ -173,6 +179,7 @@ def get_events_json_dumps_serializer(request):
     liked_event_data = [] 
     active_event_data = []
     inactive_event_data = []
+    like_count = {}
     for event in models.Event.objects.all().order_by('startdate'):
         e = {
             'user': event.user.id,
@@ -187,12 +194,12 @@ def get_events_json_dumps_serializer(request):
             'endDate': str(event.enddate),
             'tag': event.tag,
             'id': event.id,
+            'likeCount': event.likeCount
             }
-        print(request)
         liked_events=[]
         profile = get_or_create_user_profile(request.user)
         liked_events =  profile.liked_events
-
+        like_count[event.id] = event.likeCount
         if event in liked_events.all():
             liked_event_data.append(e)
         elif event.enddate.replace(tzinfo=pytz.UTC) > timezone.datetime.now().replace(tzinfo=pytz.timezone('US/Eastern')):
@@ -200,7 +207,7 @@ def get_events_json_dumps_serializer(request):
         else:
             inactive_event_data.append(e)
             
-    response_data = {"liked_events": liked_event_data, 'active_events' : active_event_data, 'inactive_events' : inactive_event_data}
+    response_data = {"liked_events": liked_event_data, 'active_events' : active_event_data, 'inactive_events' : inactive_event_data, 'like_count': like_count}
 
     response_json = json.dumps(response_data)
     print(liked_events)

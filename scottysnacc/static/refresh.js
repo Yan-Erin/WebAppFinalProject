@@ -136,12 +136,12 @@ function makeEventElement(item) {
         likeButton = `<button type="button" class="btn like_button" id="id_event_like_${item.id}" onclick="unlikeEvent(${item.id})">
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-heart-fill" viewBox="0 0 16 16">
   <path fill-rule="evenodd" d="M8 1.314C12.438-3.248 23.534 4.735 8 15-7.534 4.736 3.562-3.248 8 1.314z"/>
-</svg>  Unlike</button>`
+</svg>  ${item.likeCount} Unlike</button>`
     } else {
         likeButton = `<button type="button" class=" btn like_button" id="id_event_like_${item.id}" onclick="likeEvent(${item.id})">
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-heart" viewBox="0 0 16 16">
   <path d="m8 2.748-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01L8 2.748zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143c.06.055.119.112.176.171a3.12 3.12 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15z"/>
-</svg>  Like</button>`
+</svg>  ${item.likeCount} Like</button>`
     }
 
     let details = `
@@ -180,10 +180,12 @@ function likeEvent(event_id) {
         if (xhr.readyState != 4) return
         if (xhr.status == 200) {
             // Change the button to "Unlike"
+            let jsonResponse = JSON.parse(xhr.responseText);
+            let like_count = jsonResponse.like_count[event_id];
             document.getElementById(`id_event_like_${event_id}`).innerHTML = `
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-heart-fill" viewBox="0 0 16 16">
                 <path fill-rule="evenodd" d="M8 1.314C12.438-3.248 23.534 4.735 8 15-7.534 4.736 3.562-3.248 8 1.314z"/>
-            </svg>  Unlike`;
+            </svg>  ${like_count} Unlike`;
             document.getElementById(`id_event_like_${event_id}`).onclick = function () { unlikeEvent(event_id); };
 
             // Update liked_events list
@@ -201,6 +203,19 @@ function unlikeEvent(event_id) {
     xhr.onreadystatechange = function() {
         if (xhr.readyState != 4) return
         updatePage(xhr)
+        if (xhr.status == 200) {
+            // Change the button to "like"
+            let jsonResponse = JSON.parse(xhr.responseText);
+            let like_count = jsonResponse.like_count[event_id];
+            document.getElementById(`id_event_like_${event_id}`).innerHTML = `
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-heart" viewBox="0 0 16 16">
+            <path d="m8 2.748-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01L8 2.748zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143c.06.055.119.112.176.171a3.12 3.12 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15z"/>
+          </svg>  ${like_count} Like`;
+            document.getElementById(`id_event_like_${event_id}`).onclick = function () { likeEvent(event_id); };
+
+            // Update liked_events list
+            liked_events.push(`id=${event_id},`);
+        }
     }
     
     xhr.open("POST", `/scottysnacc/unlike-event/${event_id}`, true)
