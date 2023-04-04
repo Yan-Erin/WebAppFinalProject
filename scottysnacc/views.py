@@ -33,6 +33,7 @@ def login_action(request):
 
     # Validates the form.
     if not form.is_valid():
+        print(context)
         return render(request, 'login.html', context)
 
     new_user = authenticate(username=form.cleaned_data['username'],
@@ -65,6 +66,7 @@ def register_action(request):
 
     # Validates the form.
     if not form.is_valid():
+        print("notvalid")
         return render(request, 'register.html', context)
 
     # At this point, the form data is valid.  Register and login the user.
@@ -81,6 +83,7 @@ def register_action(request):
     new_user = authenticate(username=form.cleaned_data['username'],
                             password=form.cleaned_data['password1'])
 
+    print("Here")
     login(request, new_user)
     return redirect(reverse('home'))
 
