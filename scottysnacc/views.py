@@ -99,7 +99,8 @@ def add_action(request):
     event.name = request.POST['event_name']
     event.lng = request.POST['lng']
     event.lat = request.POST['lat']
-    event.building = request.POST['building']
+    event.buildingAddr = request.POST['buildingAddr']
+    event.buildingName = request.POST['buildingName']
     event.description = request.POST['description']
     event.specLocation = request.POST['specLocation']
     event.startdate = datetime.strptime(request.POST['start'], '%Y/%m/%d %H:%M')
@@ -129,6 +130,34 @@ def delete_action(request, event_id):
 
     return get_events_json_dumps_serializer(request)
 
+def like_action(request, event_id):
+    if not request.user.is_authenticated:
+        return _my_json_error_response("You must be logged in to do this operation", status=401)
+
+    if request.method != 'POST':
+        return _my_json_error_response("You must use a POST request for this operation", status=405)
+    
+    event_to_like = get_object_or_404(Event, id=event_id)
+    #FIFURE OUT OAUTH CONNECTION BETWEEN USER AND PROFILE
+    request.user.profile.liked_events.add(event_to_like)
+    request.user.profile.save()
+
+    return get_events_json_dumps_serializer(request)
+
+def unlike_action(request, event_id):
+    if not request.user.is_authenticated:
+        return _my_json_error_response("You must be logged in to do this operation", status=401)
+
+    if request.method != 'POST':
+        return _my_json_error_response("You must use a POST request for this operation", status=405)
+    
+    event_to_unlike = get_object_or_404(Event, id=event_id)
+    #FIFURE OUT OAUTH CONNECTION BETWEEN USER AND PROFILE
+    request.user.profile.liked_events.remove(event_to_unlike)
+    request.user.profile.save()
+
+    return get_events_json_dumps_serializer(request)
+
 def get_events_json_dumps_serializer(request):
     if not request.user.is_authenticated:
         return _my_json_error_response("Not logged-in.", status=401)
@@ -141,7 +170,8 @@ def get_events_json_dumps_serializer(request):
             'name': event.name,
             'lng': event.lng,
             'lat': event.lat,
-            'building': event.building,
+            'buildingAddr': event.buildingAddr,
+            'buildingName': event.buildingName,
             'description': event.description,
             'specLocation': event.specLocation,
             'startDate': str(event.startdate),

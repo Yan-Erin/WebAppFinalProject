@@ -7,7 +7,8 @@ class Event(models.Model):
     description = models.CharField(max_length=200, blank=True)
     lng = models.CharField(max_length=200)
     lat = models.CharField(max_length=200)
-    building = models.CharField(max_length=200)
+    buildingAddr = models.CharField(max_length=200)
+    buildingName = models.CharField(max_length=200)
     specLocation = models.CharField(max_length=200, blank=True)
     startdate = models.DateTimeField()
     enddate = models.DateTimeField()
@@ -17,7 +18,7 @@ class Event(models.Model):
         return f'id={self.id}, user={self.user}, name={self.name}'
     
 class Profile(models.Model):
-    user = models.OneToOneField(User, default=None, on_delete=models.PROTECT)
+    user = models.OneToOneField(User, default=None, on_delete=models.PROTECT, related_name="profile")
     picture = models.FileField(blank=True)
     liked_events  = models.ManyToManyField(Event)
 

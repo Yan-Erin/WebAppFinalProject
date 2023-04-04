@@ -41,7 +41,6 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'scottysnacc',
     'social_django',
-    'multiselectfield',
 ]
 
 MIDDLEWARE = [

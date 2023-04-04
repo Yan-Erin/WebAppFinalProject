@@ -28,4 +28,6 @@ urlpatterns = [
     path("scottysnacc/add-event", views.add_action),
     path('oauth/', include('social_django.urls', namespace='social'), name='social'),
     path('scottysnacc/delete-event/<int:event_id>', views.delete_action),
+    path('scottysnacc/like-event/<int:event_id>', views.like_action),
+    path('scottysnacc/unlike-event/<int:event_id>', views.unlike_action),
 ]  + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT) 

@@ -1,7 +1,6 @@
 from django import forms
 from django.contrib.auth import authenticate 
 from django.contrib.auth.models import User
-from scottysnacc import models
 
 class LoginForm(forms.Form):
     email = forms.CharField(max_length=20, widget=forms.TextInput(attrs={'id': 'id_username',

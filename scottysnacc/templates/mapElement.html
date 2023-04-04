@@ -17,7 +17,6 @@
             <div id="id_new_event"></div>
         </div>
         <div id="event_block">
-            {{ request.user.id|json_script:"user_id" }}
         </div>
     </div>
 
@@ -26,6 +25,7 @@
 // ... also call getList every 5 seconds hereafter to update the list
     window.setInterval(getEvent, 5000);
     const current_user = "{{ request.user.id }}"
+    const liked_events = "{{ request.user.profile.liked_events.all }}"
 </script>
 
 {% endblock %}

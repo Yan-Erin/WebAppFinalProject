@@ -43,6 +43,9 @@ function updatePage(xhr) {
     if (xhr.status === 200) {
         let response = JSON.parse(xhr.responseText)
         updateEventList(response["active_events"], response["inactive_events"])
+        updateEventList(response["active_events"], response["inactive_events"])
+        
+        updateEventList(response["active_events"], response["inactive_events"])   
         
         return
     }
@@ -105,21 +108,32 @@ function makeEventElement(item) {
 
     let enddate = new Date(`${item.endDate}`)
     enddate = enddate.toLocaleDateString('en-us') + " " + enddate.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+
+    let deleteButton
+    if (item.user == current_user) {
+        deleteButton = `<button type="button" class="delete_button" id="id_event_delete_${item.id}" onclick="deleteEvent(${item.id})">X</button>`
+    } else {
+        deleteButton = "<button style='visibility: hidden'>X</button> "
+    }
+
+    let likeButton
+    if (liked_events.includes(`id=${item.id},`)) {
+        likeButton = `<button type="button" class="like_button" id="id_event_like_${item.id}" onclick="unlikeEvent(${item.id})">Unlike</button>`
+    } else {
+        likeButton = `<button type="button" class="like_button" id="id_event_like_${item.id}" onclick="likeEvent(${item.id})">Like</button>`
+    }
+
     let details = `
-        <div class="event" id="id_event_element_${item.id}">    
+        <div class="event" id="id_event_element_${item.id}">   
+            ${deleteButton}<br>
             <p class="event-title">${item.name}</p>
-            <p class="event-loc">${item.building} ${item.specLocation}</p>
+            <p class="event-loc">${item.buildingName} ${item.specLocation}</p>
             <p class="event-start">${startdate} - ${enddate}</p>
             <p class="event-description">${item.description}</p>
             <p class="event-tags">${item.tag}</p>
+            ${likeButton}
         </div>
     `
-
-    if (item.user == current_user) {
-        details += `
-        <button type="button" id="id_event_delete_${item.id}" onclick="deleteEvent(${item.id})">X</button>
-        `
-    }
 
     let element = document.createElement("div")
     element.innerHTML = `${details}`
@@ -139,14 +153,32 @@ function deleteEvent(event_id) {
     xhr.send(`csrfmiddlewaretoken=${getCSRFToken()}`)
 }
 
-// context = {"eventNameValue": eventNameValue,
-//"buildingValue": buildingValue,
-//"specLocationValue": specLocationValue,
-//"startTimeValue": startTimeValue,
-//"endTimeValue": endTimeElement
-//}
+function likeEvent(event_id) {
+    let xhr = new XMLHttpRequest()
+    xhr.onreadystatechange = function() {
+        if (xhr.readyState != 4) return
+        updatePage(xhr)
+    }
+    
+    xhr.open("POST", `/scottysnacc/like-event/${event_id}`, true)
+    xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded")
+    xhr.send(`csrfmiddlewaretoken=${getCSRFToken()}`)
+}
+
+function unlikeEvent(event_id) {
+    let xhr = new XMLHttpRequest()
+    xhr.onreadystatechange = function() {
+        if (xhr.readyState != 4) return
+        updatePage(xhr)
+    }
+    
+    xhr.open("POST", `/scottysnacc/unlike-event/${event_id}`, true)
+    xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded")
+    xhr.send(`csrfmiddlewaretoken=${getCSRFToken()}`)
+}
+
 function checkEventForm (context) {
-    if (context["eventNameValue"] == "" || context["buildingValue"] == '' || context["specLocationValue"] == "") {
+    if (context["eventNameValue"] == "" || context["buildingValue"] == "") {
         console.log("1")
         return false;
     }
@@ -162,8 +194,9 @@ function addEvent() {
     let eventNameValue = eventNameElement.value
 
     let place = autocomplete.getPlace();
-
-    let buildingValue = place.name;
+    let buildingName = place.name
+    let buildingElement = document.getElementById('id_building_location_input_text')
+    let buildingAddr = buildingElement.value
 
     let geocoder = new google.maps.Geocoder();
 
@@ -185,97 +218,90 @@ function addEvent() {
     let tags = " "
 
     let allElement = document.getElementById("tag_all")
-    let allValue = allElement.value
-    if (allValue == "on") {
+    if (allElement.checked) {
         tags += "All "
     }
 
     let undergradElement = document.getElementById("tag_undergrad")
-    let undergradValue = undergradElement.value
-    if (undergradValue == "on") {
+    if (undergradElement.checked) {
         tags += "Undergraduate "
     }
 
     let graduateElement = document.getElementById("tag_graduate")
-    let graduateValue = graduateElement.value
-    if (graduateValue == "on") {
+    if (graduateElement.checked) {
         tags += "Graduate "
     }
 
     let CFAElement = document.getElementById("tag_CFA")
-    let CFAValue = CFAElement.value
-    if (CFAValue == "on") {
+    if (CFAElement.checked) {
         tags += "CFA "
     }
 
     let CITElement = document.getElementById("tag_CIT")
-    let CITValue = CITElement.value
-    if (CITValue == "on") {
+    if (CITElement.checked) {
         tags += "CIT "
     }
 
     let DCElement = document.getElementById("tag_DC")
-    let DCValue = DCElement.value
-    if (DCValue == "on") {
+    if (DCElement.checked) {
         tags += "DC "
     }
 
     let MCSElement = document.getElementById("tag_MCS")
-    let MCSValue = MCSElement.value
-    if (MCSValue == "on") {
+    if (MCSElement.checked) {
         tags += "MCS "
     }
 
     let SCSElement = document.getElementById("tag_SCS")
-    let SCSValue = SCSElement.value
-    if (SCSValue == "on") {
+    if (SCSElement.checked) {
         tags += "SCS "
     }
 
     let TPRElement = document.getElementById("tag_TPR")
-    let TPRValue = TPRElement.value
-    if (TPRValue == "on") {
+    if (TPRElement.checked) {
         tags += "TPR "
     }
 
     let HNZElement = document.getElementById("tag_HNZ")
-    let HNZValue = HNZElement.value
-    if (HNZValue == "on") {
+    if (HNZElement.checked) {
         tags += "HNZ "
     }
 
     var context = {"eventNameValue": eventNameValue,
-               "buildingValue": buildingValue,
-               "specLocationValue": specLocationValue,
+               "buildingValue": buildingAddr,
                "startTimeValue": startTimeValue,
                "endTimeValue": endTimeElement
             }
+    
     if (checkEventForm(context)) {
-        console.log("WORKED");
-        var x = document.getElementById("new-event-block");
-        x.style.display = "none";
-        var btn = document.getElementById("new-event-btn")
-        btn.style.display = "block";
-    }
+        geocoder.geocode( {'address': buildingAddr}, function(results, status) {
+            //TODO error handling
+            if (status == google.maps.GeocoderStatus.OK) {
+                var x = document.getElementById("new-event-block");
+                x.style.display = "none";
+                var btn = document.getElementById("new-event-btn")
+                btn.style.display = "block";
 
-    geocoder.geocode( {'address': buildingValue}, function(results, status) {
-        //TODO error handling
-        if (status == google.maps.GeocoderStatus.OK) {
-            console.log("GEOCODER SUCCESS")
-            lng = String(results[0].geometry.location.lng())
-            lat = String(results[0].geometry.location.lat())
-
-            let xhr = new XMLHttpRequest()
-            xhr.onreadystatechange = function() {
-                if (xhr.readyState !== 4) return
-                updatePage(xhr)
+                lng = String(results[0].geometry.location.lng())
+                lat = String(results[0].geometry.location.lat())
+    
+                let xhr = new XMLHttpRequest()
+                xhr.onreadystatechange = function() {
+                    if (xhr.readyState !== 4) return
+                    updatePage(xhr)
+                }
+    
+                xhr.open("POST", `/scottysnacc/add-event`, true)
+                xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded")
+                xhr.send(`event_name=${eventNameValue}&lng=${lng}&lat=${lat}&buildingAddr=${buildingAddr}&buildingName=${buildingName}&description=${descriptionValue}&specLocation=${specLocationValue}&start=${startTimeValue}&end=${endTimeValue}&tag=${tags}&csrfmiddlewaretoken=${getCSRFToken()}`)
             }
-            xhr.open("POST", `/scottysnacc/add-event`, true)
-            xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded")
-            xhr.send(`event_name=${eventNameValue}&lng=${lng}&lat=${lat}&building=${buildingValue}&description=${descriptionValue}&specLocation=${specLocationValue}&start=${startTimeValue}&end=${endTimeValue}&tag=${tags}&csrfmiddlewaretoken=${getCSRFToken()}`)
-            
-        }
-    });
+            else {
+                console.log("GEOCODER FAILURE")
+            }
+        });
+
+        
+    }
 }
 function closeEvent() {
     var x = document.getElementById("new-event-block");
@@ -349,7 +375,6 @@ function makeNewEventBlock() {
                 <input type="checkbox" name="tags" id="tag_SCS"> SCS 
                 <input type="checkbox" name="tags" id="tag_TPR"> TPR 
                 <input type="checkbox" name="tags" id="tag_HNZ"> HNZ <br>
-
                 <button  id='event-submit' class='btn-default' onclick="addEvent()">Submit</button>
             </div>
             </div>
