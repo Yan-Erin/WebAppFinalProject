@@ -42,11 +42,7 @@ function getEvent() {
 function updatePage(xhr) {
     if (xhr.status === 200) {
         let response = JSON.parse(xhr.responseText)
-        updateEventList(response['liked_events'], response["active_events"], response["inactive_events"])
-        updateEventList(response['liked_events'], response["active_events"], response["inactive_events"])
-        
-        updateEventList(response['liked_events'], response["active_events"], response["inactive_events"])   
-        
+        updateEventList(response[ "user_liked_event_ids"], response['liked_events'], response["active_events"], response["inactive_events"])
         return
     }
 
@@ -82,7 +78,7 @@ function showSelectedEvent(event_id) {
     let eventElement = document.getElementById(`id_event_element_${event_id}`)
 }
 
-function updateEventList(liked_items, active_items, inactive_items) {
+function updateEventList(liked_set, liked_items, active_items, inactive_items) {
     
     let div = document.getElementById("event_block")
 
@@ -91,7 +87,7 @@ function updateEventList(liked_items, active_items, inactive_items) {
     }
 
     function isItemLiked(item) {
-        return liked_items.some(liked_item => liked_item.id === item.id);
+        return item in liked_set;
     }
 
     while (div.hasChildNodes()) {
@@ -99,7 +95,7 @@ function updateEventList(liked_items, active_items, inactive_items) {
     }
     //TODO STYLING FOR PAST EVENTS
     inactive_items.forEach(item => {
-        div.prepend(makeEventElement(item), isItemLiked(item))
+        div.prepend(makeEventElement(item, isItemLiked(item)))
         let location = {lat: Number(item.lat), lng: Number(item.lng)}
         let marker = new google.maps.Marker({position: location, map: map})
         marker.addListener("click", () => {
@@ -108,7 +104,7 @@ function updateEventList(liked_items, active_items, inactive_items) {
     })
 
     active_items.forEach(item => {
-        div.prepend(makeEventElement(item), isItemLiked(item))
+        div.prepend(makeEventElement(item, isItemLiked(item)))
         let location = {lat: Number(item.lat), lng: Number(item.lng)}
         let marker = new google.maps.Marker({position: location, map: map})
         marker.addListener("click", () => {
@@ -117,7 +113,7 @@ function updateEventList(liked_items, active_items, inactive_items) {
     })
 
     liked_items.forEach(item => {
-        div.prepend(makeEventElement(item), true)
+        div.prepend(makeEventElement(item, true))
         let location = {lat: Number(item.lat), lng: Number(item.lng)}
         let marker = new google.maps.Marker({position: location, map: map})
         marker.addListener("click", () => {
@@ -223,8 +219,6 @@ function unlikeEvent(event_id) {
           </svg>  ${like_count}`;
             document.getElementById(`id_event_like_${event_id}`).onclick = function () { likeEvent(event_id); };
 
-            // Update liked_events list
-            liked_events.push(`id=${event_id},`);
         }
     }
     

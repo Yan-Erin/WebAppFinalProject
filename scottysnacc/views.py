@@ -152,10 +152,11 @@ def like_action(request, event_id):
     event_to_like.likeCount +=1
     event_to_like.save() 
     temp = get_events_json_dumps_serializer(request)
-    temp["like_count"] = event_to_like.likeCount
+    print("likedEvents: ",  [str(event) for event in profile.liked_events.all()])
     return temp
 
 def unlike_action(request, event_id):
+    print("UNLIKEING")
     if not request.user.is_authenticated:
         return _my_json_error_response("You must be logged in to do this operation", status=401)
 
@@ -169,7 +170,6 @@ def unlike_action(request, event_id):
     request.user.profile.liked_events.remove(event_to_unlike)
     request.user.profile.save()
     temp = get_events_json_dumps_serializer(request)
-    temp["like_count"] = event_to_unlike.likeCount
     return temp
 
 def get_events_json_dumps_serializer(request):
@@ -207,10 +207,15 @@ def get_events_json_dumps_serializer(request):
         else:
             inactive_event_data.append(e)
             
-    response_data = {"liked_events": liked_event_data, 'active_events' : active_event_data, 'inactive_events' : inactive_event_data, 'like_count': like_count}
+    user_liked_event_ids = [event.id for event in liked_events.all()] 
+    print("json_dumps: ", [str(event) for event in request.user.profile.liked_events.all()]) 
+    response_data = {"liked_events": liked_event_data, 
+                     'active_events' : active_event_data, 
+                     'inactive_events' : inactive_event_data, 
+                     'like_count': like_count,
+                     "user_liked_event_ids": user_liked_event_ids}
 
     response_json = json.dumps(response_data)
-    print(liked_events)
     return HttpResponse(response_json, content_type='application/json')
 
 
