@@ -200,9 +200,11 @@ def get_events_json_dumps_serializer(request):
         profile = get_or_create_user_profile(request.user)
         liked_events =  profile.liked_events
         like_count[event.id] = event.likeCount
+
         if event in liked_events.all():
             liked_event_data.append(e)
-        elif event.enddate.replace(tzinfo=pytz.UTC) > timezone.datetime.now().replace(tzinfo=pytz.timezone('US/Eastern')):
+            
+        if event.enddate.replace(tzinfo=pytz.UTC) > timezone.datetime.now().replace(tzinfo=pytz.timezone('US/Eastern')):
             active_event_data.append(e)
         else:
             inactive_event_data.append(e)

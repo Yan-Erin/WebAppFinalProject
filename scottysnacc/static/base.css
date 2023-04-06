@@ -17,6 +17,11 @@ h2 {
 .form-item {
     margin:0.25rem;
 }
+.inactive-event {
+    background-color: #e6e6e6;
+    padding:3rem 3rem 2rem 6rem;
+    border-bottom: 1px solid #717579;
+}
 .event {
     background-color: #F5F3F4;
     padding:3rem 3rem 2rem 6rem;

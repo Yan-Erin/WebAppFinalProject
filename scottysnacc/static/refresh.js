@@ -87,7 +87,9 @@ function updateEventList(liked_set, liked_items, active_items, inactive_items) {
     }
 
     function isItemLiked(item) {
-        return item in liked_set;
+        let inlist = liked_set.includes(item.id);
+        console.log(inlist)
+        return inlist;
     }
 
     while (div.hasChildNodes()) {
@@ -95,7 +97,7 @@ function updateEventList(liked_set, liked_items, active_items, inactive_items) {
     }
     //TODO STYLING FOR PAST EVENTS
     inactive_items.forEach(item => {
-        div.prepend(makeEventElement(item, isItemLiked(item)))
+        div.prepend(makeEventElement(item, isItemLiked(item), false))
         let location = {lat: Number(item.lat), lng: Number(item.lng)}
         let marker = new google.maps.Marker({position: location, map: map})
         marker.addListener("click", () => {
@@ -104,7 +106,7 @@ function updateEventList(liked_set, liked_items, active_items, inactive_items) {
     })
 
     active_items.forEach(item => {
-        div.prepend(makeEventElement(item, isItemLiked(item)))
+        div.prepend(makeEventElement(item, isItemLiked(item), true))
         let location = {lat: Number(item.lat), lng: Number(item.lng)}
         let marker = new google.maps.Marker({position: location, map: map})
         marker.addListener("click", () => {
@@ -112,17 +114,9 @@ function updateEventList(liked_set, liked_items, active_items, inactive_items) {
         })
     })
 
-    liked_items.forEach(item => {
-        div.prepend(makeEventElement(item, true))
-        let location = {lat: Number(item.lat), lng: Number(item.lng)}
-        let marker = new google.maps.Marker({position: location, map: map})
-        marker.addListener("click", () => {
-            let eventElement = document.getElementById(`id_event_element_${item.id}`).scrollIntoView()
-        })
-    })
 }
 // Builds a new HTML "li" element for the to do list
-function makeEventElement(item, liked) {
+function makeEventElement(item, liked, active) {
     let startdate = new Date(`${item.startDate}`)
     startdate = startdate.toLocaleDateString('en-us') + " " + startdate.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
 
@@ -149,8 +143,9 @@ function makeEventElement(item, liked) {
   <path d="m8 2.748-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01L8 2.748zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143c.06.055.119.112.176.171a3.12 3.12 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15z"/>
 </svg>  ${item.likeCount}</button>`
     }
-
-    let details = `
+    let details = ``
+    if (active) {
+        details = `
         <div class="event" id="id_event_element_${item.id}">   
             ${deleteButton}<br>
             <p class="event-title">${item.name}</p>
@@ -161,6 +156,20 @@ function makeEventElement(item, liked) {
             ${likeButton}
         </div>
     `
+    } else {
+        details = `
+            <div class="inactive-event" id="id_event_element_${item.id}">   
+            ${deleteButton}<br>
+            <p class="event-title">${item.name}</p>
+            <p class="event-loc">${item.buildingName} ${item.specLocation}</p>
+            <p class="event-start">${startdate} - ${enddate}</p>
+            <p class="event-description"><u>Description:</u> ${item.description}</p>
+            <p class="event-tags"><u>Tags:</u> ${item.tag.trim().split(" ").join(", ")}</p> 
+            ${likeButton}
+            </div>
+        `   
+}
+
 
     let element = document.createElement("div")
     element.innerHTML = `${details}`
