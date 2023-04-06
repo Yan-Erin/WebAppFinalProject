@@ -180,6 +180,7 @@ def get_events_json_dumps_serializer(request):
     active_event_data = []
     inactive_event_data = []
     like_count = {}
+    user_liked_event_ids = []
     for event in models.Event.objects.all().order_by('startdate'):
         e = {
             'user': event.user.id,
@@ -196,7 +197,6 @@ def get_events_json_dumps_serializer(request):
             'id': event.id,
             'likeCount': event.likeCount
             }
-        liked_events=[]
         profile = get_or_create_user_profile(request.user)
         liked_events =  profile.liked_events
         like_count[event.id] = event.likeCount
@@ -207,7 +207,7 @@ def get_events_json_dumps_serializer(request):
         else:
             inactive_event_data.append(e)
             
-    user_liked_event_ids = [event.id for event in liked_events.all()] 
+        user_liked_event_ids += [event.id for event in liked_events.all()] 
     print("json_dumps: ", [str(event) for event in request.user.profile.liked_events.all()]) 
     response_data = {"liked_events": liked_event_data, 
                      'active_events' : active_event_data, 
