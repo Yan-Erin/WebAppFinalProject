@@ -181,7 +181,7 @@ def get_events_json_dumps_serializer(request):
     inactive_event_data = []
     like_count = {}
     user_liked_event_ids = []
-    for event in models.Event.objects.all().order_by('startdate'):
+    for event in models.Event.objects.all().order_by('-enddate'):
         e = {
             'user': event.user.id,
             'name': event.name,

@@ -202,9 +202,6 @@ function likeEvent(event_id) {
                 <path fill-rule="evenodd" d="M8 1.314C12.438-3.248 23.534 4.735 8 15-7.534 4.736 3.562-3.248 8 1.314z"/>
             </svg>  ${like_count}`;
             document.getElementById(`id_event_like_${event_id}`).onclick = function () { unlikeEvent(event_id); };
-
-            // Update liked_events list
-            liked_events.push(`id=${event_id},`);
         }
     }
 
