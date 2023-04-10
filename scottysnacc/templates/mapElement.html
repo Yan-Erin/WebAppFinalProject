@@ -18,6 +18,8 @@
         </div>
         <div id="update_error"></div>
         <div id="event_block">
+            <div id="filter"></div>
+            <div id="events"></div>
         </div>
     </div>
 
@@ -26,7 +28,7 @@
 // ... also call getList every 5 seconds hereafter to update the list
     window.setInterval(getEvent, 5000);
     const current_user = "{{ request.user.id }}"
-    const liked_events = "{{ request.user.profile.liked_events.all }}"
+    const user_tags = " {{ request.user.profile.tag }}"
 </script>
 
 {% endblock %}

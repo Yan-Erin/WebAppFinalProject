@@ -1,6 +1,7 @@
 "use strict"
 let map;
 let autocomplete;
+let markers = [];
 function initMap() {
     let CMU = {lat: 40.443336, lng: -79.944023};
     map = new google.maps.Map(
@@ -42,7 +43,7 @@ function getEvent() {
 function updatePage(xhr) {
     if (xhr.status === 200) {
         let response = JSON.parse(xhr.responseText)
-        updateEventList(response[ "user_liked_event_ids"], response['liked_events'], response["active_events"], response["inactive_events"])
+        updateEventList(response["user_liked_event_ids"], response['liked_events'], response["active_events"], response["inactive_events"], response["user_tags"])
         return
     }
 
@@ -78,12 +79,11 @@ function showSelectedEvent(event_id) {
     let eventElement = document.getElementById(`id_event_element_${event_id}`)
 }
 
-function updateEventList(liked_set, liked_items, active_items, inactive_items) {
-    
-    let div = document.getElementById("event_block")
+function updateEventList(liked_set, liked_items, active_items, inactive_items, tags) {
+    let event_div = document.getElementById("events")
 
-    while (div.hasChildNodes()) {
-        div.firstChild.remove();
+    while (event_div.hasChildNodes()) {
+        event_div.firstChild.remove();
     }
 
     function isItemLiked(item) {
@@ -92,29 +92,112 @@ function updateEventList(liked_set, liked_items, active_items, inactive_items) {
         return inlist;
     }
 
-    while (div.hasChildNodes()) {
-        div.firstChild.remove()
-    }
-    //TODO STYLING FOR PAST EVENTS
     inactive_items.forEach(item => {
-        div.prepend(makeEventElement(item, isItemLiked(item), false))
+        event_div.prepend(makeEventElement(item, isItemLiked(item), false))
         let location = {lat: Number(item.lat), lng: Number(item.lng)}
         let marker = new google.maps.Marker({position: location, map: map})
+        markers.push(marker)
         marker.addListener("click", () => {
             let eventElement = document.getElementById(`id_event_element_${item.id}`).scrollIntoView()
         })
     })
 
     active_items.forEach(item => {
-        div.prepend(makeEventElement(item, isItemLiked(item), true))
+        event_div.prepend(makeEventElement(item, isItemLiked(item), true))
         let location = {lat: Number(item.lat), lng: Number(item.lng)}
         let marker = new google.maps.Marker({position: location, map: map})
+        markers.push(marker)
         marker.addListener("click", () => {
             let eventElement = document.getElementById(`id_event_element_${item.id}`).scrollIntoView()
         })
     })
 
+    let filter_div = document.getElementById("filter")
+    if (filter_div.innerHTML === "") {
+        filter_div.prepend(makeFilterElement(user_tags))
+    }
 }
+
+function setMapOnAll(map) {
+    for (let i = 0; i < markers.length; i++) {
+        markers[i].setMap(map);
+    }
+}
+
+function deleteMarkers() {
+    setMapOnAll(null);
+    markers = [];
+}
+
+function makeFilterElement(tags) {
+    let undergrad, graduate, CFA, CIT, DC, MCS, SCS, TPR, HNZ
+    let isUndergrad, isGraduate, isCFA, isCIT, isDC, isMCS, isSCS, isTPR, isHNZ
+
+    if (tags.includes("Undergrad")) {
+        isUndergrad = "checked"
+    }
+
+    if (tags.includes("Graduate")) {
+        isGraduate = "checked"
+    }
+
+    if (tags.includes("CFA")) {
+        isCFA = "checked"
+    }
+
+    if (tags.includes("CIT")) {
+        isCIT = "checked"
+    }
+
+    if (tags.includes("DC")) {
+        isDC = "checked"
+    }
+
+    if (tags.includes("MCS")) {
+        isMCS = "checked"
+    }
+
+    if (tags.includes("SCS")) {
+        isSCS = "checked"
+    }
+
+    if (tags.includes("TPR")) {
+        isTPR = "checked"
+    }
+
+    if (tags.includes("HNZ")) {
+        isHNZ = "checked"
+    }
+
+    undergrad = `<input type="checkbox" name="tags" id="filter_undergrad" ${isUndergrad}> Undergrad`
+    graduate = `<input type="checkbox" name="tags" id="filter_graduate" ${isGraduate}> Graduate`
+    CFA = `<input type="checkbox" name="tags" id="filter_CFA" ${isCFA}> CFA`
+    CIT = `<input type="checkbox" name="tags" id="filter_CIT" ${isCIT}> CIT`
+    DC = `<input type="checkbox" name="tags" id="filter_DC" ${isDC}> DC`
+    MCS = `<input type="checkbox" name="tags" id="filter_MCS" ${isMCS}> MCS`
+    SCS = `<input type="checkbox" name="tags" id="filter_SCS" ${isSCS}> SCS`
+    TPR = `<input type="checkbox" name="tags" id="filter_TPR" ${isTPR}> TPR`
+    HNZ = `<input type="checkbox" name="tags" id="filter_HNZ" ${isHNZ}> HNZ`
+
+    let details = `
+    ${undergrad}
+    ${graduate} <br>
+    ${CFA}
+    ${CIT}
+    ${DC}
+    ${MCS}
+    ${SCS}
+    ${TPR}
+    ${HNZ} <br>
+    <button  id='filter-submit' class='btn-default' onclick="updateFilter()">Update</button>
+    `
+
+    let element = document.createElement("div")
+    element.innerHTML = `${details}`
+
+    return element
+}
+
 // Builds a new HTML "li" element for the to do list
 function makeEventElement(item, liked, active) {
     let startdate = new Date(`${item.startDate}`)
@@ -127,7 +210,7 @@ function makeEventElement(item, liked, active) {
     if (item.user == current_user) {
         deleteButton = `<button type="button" class="btn delete_button" id="id_event_delete_${item.id}" onclick="deleteEvent(${item.id})">X</button>`
     } else {
-        deleteButton = "<button style='visibility: hidden'>X</button> "
+        deleteButton = "<button style='visibility: hidden'>X</button>"
     }
 
     let likeButton
@@ -170,11 +253,77 @@ function makeEventElement(item, liked, active) {
         `   
 }
 
-
     let element = document.createElement("div")
     element.innerHTML = `${details}`
 
     return element
+}
+
+function updateFilter() {
+    let tags = "All "
+
+    let undergradElement = document.getElementById("filter_undergrad")
+    if (undergradElement.checked) {
+        tags += "Undergrad "
+    }
+
+    let graduateElement = document.getElementById("filter_graduate")
+    if (graduateElement.checked) {
+        tags += "Graduate "
+    }
+
+    let CFAElement = document.getElementById("filter_CFA")
+    if (CFAElement.checked) {
+        tags += "CFA "
+    }
+
+    let CITElement = document.getElementById("filter_CIT")
+    if (CITElement.checked) {
+        tags += "CIT "
+    }
+
+    let DCElement = document.getElementById("filter_DC")
+    if (DCElement.checked) {
+        tags += "DC "
+    }
+
+    let MCSElement = document.getElementById("filter_MCS")
+    if (MCSElement.checked) {
+        tags += "MCS "
+    }
+
+    let SCSElement = document.getElementById("filter_SCS")
+    if (SCSElement.checked) {
+        tags += "SCS "
+    }
+
+    let TPRElement = document.getElementById("filter_TPR")
+    if (TPRElement.checked) {
+        tags += "TPR "
+    }
+
+    let HNZElement = document.getElementById("filter_HNZ")
+    if (HNZElement.checked) {
+        tags += "HNZ "
+    }
+
+    let filter_div = document.getElementById("filter")
+    while (filter_div.hasChildNodes()) {
+        filter_div.firstChild.remove();
+    }
+
+    filter_div.prepend(makeFilterElement(tags))
+    deleteMarkers();
+
+    let xhr = new XMLHttpRequest()
+    xhr.onreadystatechange = function() {
+        if (xhr.readyState !== 4) return
+        updatePage(xhr)
+    }
+
+    xhr.open("POST", `/scottysnacc/update-filter`, true)
+    xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded")
+    xhr.send(`tag=${tags}&csrfmiddlewaretoken=${getCSRFToken()}`)
 }
 
 function deleteEvent(event_id) {
@@ -310,7 +459,7 @@ function addEvent() {
 
     let undergradElement = document.getElementById("tag_undergrad")
     if (undergradElement.checked) {
-        tags += "Undergraduate "
+        tags += "Undergrad "
     }
 
     let graduateElement = document.getElementById("tag_graduate")
@@ -451,7 +600,7 @@ function makeNewEventBlock() {
                 <path d="M2 1h4.586a1 1 0 0 1 .707.293l7 7a1 1 0 0 1 0 1.414l-4.586 4.586a1 1 0 0 1-1.414 0l-7-7A1 1 0 0 1 1 6.586V2a1 1 0 0 1 1-1zm0 5.586 7 7L13.586 9l-7-7H2v4.586z"/>
                 </svg>  Tags</label><br>
                 <input type="checkbox" name="tags" id="tag_all"> All 
-                <input type="checkbox" name="tags" id="tag_undergrad"> Undergraduate 
+                <input type="checkbox" name="tags" id="tag_undergrad"> Undergrad 
                 <input type="checkbox" name="tags" id="tag_graduate"> Graduate <br>
                 <input type="checkbox" name="tags" id="tag_CFA"> CFA 
                 <input type="checkbox" name="tags" id="tag_CIT"> CIT 

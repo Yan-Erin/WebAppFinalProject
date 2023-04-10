@@ -30,4 +30,5 @@ urlpatterns = [
     path('scottysnacc/delete-event/<int:event_id>', views.delete_action),
     path('scottysnacc/like-event/<int:event_id>', views.like_action),
     path('scottysnacc/unlike-event/<int:event_id>', views.unlike_action),
+    path('scottysnacc/update-filter', views.filter_action),
 ]  + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT) 

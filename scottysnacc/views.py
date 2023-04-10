@@ -78,20 +78,28 @@ def register_action(request):
 
     profile = Profile()
     profile.user = new_user
+    profile.tag = "All Undergrad Graduate CFA CIT DC MCS SCS TPR HNZ"
     profile.save()
 
     new_user = authenticate(username=form.cleaned_data['username'],
                             password=form.cleaned_data['password1'])
 
-    print("Here")
     login(request, new_user)
     return redirect(reverse('home'))
 
 def get_or_create_user_profile(user):
     profile, created = Profile.objects.get_or_create(user=user)
     if created:
+        profile.tag = "All Undergrad Graduate CFA CIT DC MCS SCS TPR HNZ"
         profile.save()
     return profile
+
+def filter_action(request):
+    profile = get_object_or_404(Profile, id=request.user.id)
+    profile.tag = request.POST['tag']
+    profile.save()
+
+    return get_events_json_dumps_serializer(request)
 
 def add_action(request):
     #TODO more error handling
@@ -151,9 +159,7 @@ def like_action(request, event_id):
     profile.liked_events.add(event_to_like)
     event_to_like.likeCount +=1
     event_to_like.save() 
-    temp = get_events_json_dumps_serializer(request)
-    print("likedEvents: ",  [str(event) for event in profile.liked_events.all()])
-    return temp
+    return get_events_json_dumps_serializer(request)
 
 def unlike_action(request, event_id):
     print("UNLIKEING")
@@ -166,11 +172,9 @@ def unlike_action(request, event_id):
     event_to_unlike = get_object_or_404(Event, id=event_id)
     event_to_unlike.likeCount-=1
     event_to_unlike.save() 
-    #FIFURE OUT OAUTH CONNECTION BETWEEN USER AND PROFILE
     request.user.profile.liked_events.remove(event_to_unlike)
     request.user.profile.save()
-    temp = get_events_json_dumps_serializer(request)
-    return temp
+    return get_events_json_dumps_serializer(request)
 
 def get_events_json_dumps_serializer(request):
     if not request.user.is_authenticated:
@@ -181,7 +185,13 @@ def get_events_json_dumps_serializer(request):
     inactive_event_data = []
     like_count = {}
     user_liked_event_ids = []
+    shouldShow = False
+    profile = get_or_create_user_profile(request.user)
+    liked_events =  profile.liked_events
+    print(profile.tag)
+
     for event in models.Event.objects.all().order_by('-enddate'):
+        shouldShow = False
         e = {
             'user': event.user.id,
             'name': event.name,
@@ -197,25 +207,31 @@ def get_events_json_dumps_serializer(request):
             'id': event.id,
             'likeCount': event.likeCount
             }
-        profile = get_or_create_user_profile(request.user)
-        liked_events =  profile.liked_events
+        
         like_count[event.id] = event.likeCount
 
-        if event in liked_events.all():
-            liked_event_data.append(e)
-            
-        if event.enddate.replace(tzinfo=pytz.UTC) > timezone.datetime.now().replace(tzinfo=pytz.timezone('US/Eastern')):
-            active_event_data.append(e)
-        else:
-            inactive_event_data.append(e)
-            
-        user_liked_event_ids += [event.id for event in liked_events.all()] 
-    print("json_dumps: ", [str(event) for event in request.user.profile.liked_events.all()]) 
+        for tag in profile.tag.split():
+            if tag in event.tag.split():
+                shouldShow = True
+
+        if (shouldShow):
+            if event in liked_events.all():
+                liked_event_data.append(e)
+            print(event.enddate.replace(tzinfo=pytz.UTC))
+            print(timezone.datetime.now().replace(tzinfo=pytz.timezone('US/Eastern')))
+            if event.enddate.replace(tzinfo=pytz.UTC) > timezone.datetime.now().replace(tzinfo=pytz.timezone('US/Eastern')):
+                active_event_data.append(e)
+            else:
+                inactive_event_data.append(e)
+
+    user_liked_event_ids += [event.id for event in liked_events.all()] 
+
     response_data = {"liked_events": liked_event_data, 
                      'active_events' : active_event_data, 
                      'inactive_events' : inactive_event_data, 
                      'like_count': like_count,
-                     "user_liked_event_ids": user_liked_event_ids}
+                     "user_liked_event_ids": user_liked_event_ids,
+                     "user_tags": profile.tag}
 
     response_json = json.dumps(response_data)
     return HttpResponse(response_json, content_type='application/json')

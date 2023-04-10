@@ -22,12 +22,7 @@ class Event(models.Model):
 class Profile(models.Model):
     user = models.OneToOneField(User, default=None, on_delete=models.PROTECT, related_name="profile")
     liked_events  = models.ManyToManyField(Event)
+    tag = models.CharField(max_length=200)
 
     def __str__(self):
         return f'id={self.id}, user={self.user}'
-
-def get_or_create_user_profile(user):
-    profile, created = Profile.objects.get_or_create(user=user)
-    if created:
-        profile.save()
-    return profile
