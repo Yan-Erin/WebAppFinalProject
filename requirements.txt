@@ -1,0 +1,4 @@
+Django
+pytz
+django-allauth
+social-auth-app-django
