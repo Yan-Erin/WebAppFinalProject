@@ -2,11 +2,13 @@
 let map;
 let autocomplete;
 let markers = [];
+let filter_list = ["Undergrad", "Graduate", "CFA", "CIT", "DC", "MCS", "SCS", "TPR", "HNZ"];
+
 function initMap() {
     let CMU = {lat: 40.443336, lng: -79.944023};
     map = new google.maps.Map(
         document.getElementById('map'), {
-            zoom: 15,
+            zoom: 17,
             center: CMU,
             disableDefaultUI: true,
         }
@@ -27,10 +29,8 @@ function setUpDateTime() {
     $('#id_end_time_input_text').datetimepicker();
 }
 
-// Sends a new request to update the to-do list
 function getEvent() {
     let xhr = new XMLHttpRequest()
-    console.log("Refresh");
     xhr.onreadystatechange = function() {
         if (this.readyState !== 4) return
         updatePage(xhr)
@@ -43,7 +43,7 @@ function getEvent() {
 function updatePage(xhr) {
     if (xhr.status === 200) {
         let response = JSON.parse(xhr.responseText)
-        updateEventList(response["user_liked_event_ids"], response['liked_events'], response["active_events"], response["inactive_events"], response["user_tags"])
+        updateEventList(response["user_liked_event_ids"], response["active_events"], response["inactive_events"], response["user_tags"])
         return
     }
 
@@ -62,7 +62,6 @@ function updatePage(xhr) {
         displayError(response.error, false)
         return
     }
-
 }
 
 function displayError(message, isForm) {
@@ -74,12 +73,8 @@ function displayError(message, isForm) {
     }
     errorElement.innerHTML = message
 }
-//TODO
-function showSelectedEvent(event_id) {
-    let eventElement = document.getElementById(`id_event_element_${event_id}`)
-}
 
-function updateEventList(liked_set, liked_items, active_items, inactive_items, tags) {
+function updateEventList(liked_set, active_items, inactive_items, tags) {
     let event_div = document.getElementById("events")
 
     while (event_div.hasChildNodes()) {
@@ -88,29 +83,29 @@ function updateEventList(liked_set, liked_items, active_items, inactive_items, t
 
     function isItemLiked(item) {
         let inlist = liked_set.includes(item.id);
-        console.log(inlist)
         return inlist;
     }
 
-    inactive_items.forEach(item => {
-        event_div.prepend(makeEventElement(item, isItemLiked(item), false))
-        let location = {lat: Number(item.lat), lng: Number(item.lng)}
-        let marker = new google.maps.Marker({position: location, map: map})
-        markers.push(marker)
-        marker.addListener("click", () => {
-            let eventElement = document.getElementById(`id_event_element_${item.id}`).scrollIntoView()
+    [inactive_items, active_items].forEach(event => {
+        event.forEach(item => {
+            event_div.prepend(makeEventElement(item, isItemLiked(item), true))
+            let setMarker = true
+            let location = new google.maps.LatLng(Number(item.lat), Number(item.lng))
+            for (var i = 0; i < markers.length; i++) {
+                if (markers[i].getPosition().equals(location)) {
+                    setMarker = false
+                }
+            }
+    
+            if (setMarker) {
+                let marker = new google.maps.Marker({position: location, map: map})
+                markers.push(marker)
+                marker.addListener("click", () => {
+                let eventElement = document.getElementById(`id_event_element_${item.id}`).scrollIntoView()
+                }) 
+            }
         })
-    })
-
-    active_items.forEach(item => {
-        event_div.prepend(makeEventElement(item, isItemLiked(item), true))
-        let location = {lat: Number(item.lat), lng: Number(item.lng)}
-        let marker = new google.maps.Marker({position: location, map: map})
-        markers.push(marker)
-        marker.addListener("click", () => {
-            let eventElement = document.getElementById(`id_event_element_${item.id}`).scrollIntoView()
-        })
-    })
+    }) 
 
     let filter_div = document.getElementById("filter")
     if (filter_div.innerHTML === "") {
@@ -130,67 +125,18 @@ function deleteMarkers() {
 }
 
 function makeFilterElement(tags) {
-    let undergrad, graduate, CFA, CIT, DC, MCS, SCS, TPR, HNZ
-    let isUndergrad, isGraduate, isCFA, isCIT, isDC, isMCS, isSCS, isTPR, isHNZ
 
-    if (tags.includes("Undergrad")) {
-        isUndergrad = "checked"
-    }
+    let details = "";
 
-    if (tags.includes("Graduate")) {
-        isGraduate = "checked"
-    }
+    filter_list.forEach(tag => {
+        if (tags.includes(`${tag}`)) {
+            details += `<input type="checkbox" name="tags" id="filter_${tag}" checked> ${tag} `
+        } else {
+            details += `<input type="checkbox" name="tags" id="filter_${tag}"> ${tag} `
+        }
+    })
 
-    if (tags.includes("CFA")) {
-        isCFA = "checked"
-    }
-
-    if (tags.includes("CIT")) {
-        isCIT = "checked"
-    }
-
-    if (tags.includes("DC")) {
-        isDC = "checked"
-    }
-
-    if (tags.includes("MCS")) {
-        isMCS = "checked"
-    }
-
-    if (tags.includes("SCS")) {
-        isSCS = "checked"
-    }
-
-    if (tags.includes("TPR")) {
-        isTPR = "checked"
-    }
-
-    if (tags.includes("HNZ")) {
-        isHNZ = "checked"
-    }
-
-    undergrad = `<input type="checkbox" name="tags" id="filter_undergrad" ${isUndergrad}> Undergrad`
-    graduate = `<input type="checkbox" name="tags" id="filter_graduate" ${isGraduate}> Graduate`
-    CFA = `<input type="checkbox" name="tags" id="filter_CFA" ${isCFA}> CFA`
-    CIT = `<input type="checkbox" name="tags" id="filter_CIT" ${isCIT}> CIT`
-    DC = `<input type="checkbox" name="tags" id="filter_DC" ${isDC}> DC`
-    MCS = `<input type="checkbox" name="tags" id="filter_MCS" ${isMCS}> MCS`
-    SCS = `<input type="checkbox" name="tags" id="filter_SCS" ${isSCS}> SCS`
-    TPR = `<input type="checkbox" name="tags" id="filter_TPR" ${isTPR}> TPR`
-    HNZ = `<input type="checkbox" name="tags" id="filter_HNZ" ${isHNZ}> HNZ`
-
-    let details = `
-    ${undergrad}
-    ${graduate} <br>
-    ${CFA}
-    ${CIT}
-    ${DC}
-    ${MCS}
-    ${SCS}
-    ${TPR}
-    ${HNZ} <br>
-    <button  id='filter-submit' class='btn-default' onclick="updateFilter()">Update</button>
-    `
+    details += `<br> <button id='filter-submit' class='btn-default' onclick="updateFilter()">Update</button>`
 
     let element = document.createElement("div")
     element.innerHTML = `${details}`
@@ -198,7 +144,6 @@ function makeFilterElement(tags) {
     return element
 }
 
-// Builds a new HTML "li" element for the to do list
 function makeEventElement(item, liked, active) {
     let startdate = new Date(`${item.startDate}`)
     startdate = startdate.toLocaleDateString('en-us') + " " + startdate.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
@@ -214,44 +159,40 @@ function makeEventElement(item, liked, active) {
     }
 
     let likeButton
-
     if (liked) {
         likeButton = `<button type="button" class="btn like_button" id="id_event_like_${item.id}" onclick="unlikeEvent(${item.id})">
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-heart-fill" viewBox="0 0 16 16">
-  <path fill-rule="evenodd" d="M8 1.314C12.438-3.248 23.534 4.735 8 15-7.534 4.736 3.562-3.248 8 1.314z"/>
-</svg>  ${item.likeCount}</button>`
+        <path fill-rule="evenodd" d="M8 1.314C12.438-3.248 23.534 4.735 8 15-7.534 4.736 3.562-3.248 8 1.314z"/>
+        </svg>  ${item.likeCount}</button>`
     } else {
         likeButton = `<button type="button" class=" btn like_button" id="id_event_like_${item.id}" onclick="likeEvent(${item.id})">
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-heart" viewBox="0 0 16 16">
-  <path d="m8 2.748-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01L8 2.748zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143c.06.055.119.112.176.171a3.12 3.12 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15z"/>
-</svg>  ${item.likeCount}</button>`
+        <path d="m8 2.748-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01L8 2.748zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143c.06.055.119.112.176.171a3.12 3.12 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15z"/>
+        </svg>  ${item.likeCount}</button>`
     }
-    let details = ``
+    
+    let event_class
     if (active) {
-        details = `
-        <div class="event" id="id_event_element_${item.id}">   
-            ${deleteButton}<br>
-            <p class="event-title">${item.name}</p>
-            <p class="event-loc">${item.buildingName} ${item.specLocation}</p>
-            <p class="event-start">${startdate} - ${enddate}</p>
-            <p class="event-description"><u>Description:</u> ${item.description}</p>
-            <p class="event-tags"><u>Tags:</u> ${item.tag.trim().split(" ").join(", ")}</p> 
-            ${likeButton}
-        </div>
-    `
+        event_class = "event"
     } else {
-        details = `
-            <div class="inactive-event" id="id_event_element_${item.id}">   
-            ${deleteButton}<br>
-            <p class="event-title">${item.name}</p>
-            <p class="event-loc">${item.buildingName} ${item.specLocation}</p>
-            <p class="event-start">${startdate} - ${enddate}</p>
-            <p class="event-description"><u>Description:</u> ${item.description}</p>
-            <p class="event-tags"><u>Tags:</u> ${item.tag.trim().split(" ").join(", ")}</p> 
-            ${likeButton}
-            </div>
-        `   
-}
+        event_class = "inactive-event"
+    }
+    let description = ""
+    if (item.description != "") {
+        description = `<p class="event-description"><u>Description:</u> ${item.description}</p>`
+    }
+
+    let details = `
+        <div class=${event_class} id="id_event_element_${item.id}">   
+        ${deleteButton}<br>
+        <p class="event-title">${item.name}</p>
+        <p class="event-loc">${item.buildingName} ${item.specLocation}</p>
+        <p class="event-start">${startdate} - ${enddate}</p>
+        ${description}
+        <p class="event-tags"><u>Tags:</u> ${item.tag.trim().split(" ").join(", ")}</p> 
+        ${likeButton}
+        </div>
+    ` 
 
     let element = document.createElement("div")
     element.innerHTML = `${details}`
@@ -262,62 +203,19 @@ function makeEventElement(item, liked, active) {
 function updateFilter() {
     let tags = "All "
 
-    let undergradElement = document.getElementById("filter_undergrad")
-    if (undergradElement.checked) {
-        tags += "Undergrad "
-    }
-
-    let graduateElement = document.getElementById("filter_graduate")
-    if (graduateElement.checked) {
-        tags += "Graduate "
-    }
-
-    let CFAElement = document.getElementById("filter_CFA")
-    if (CFAElement.checked) {
-        tags += "CFA "
-    }
-
-    let CITElement = document.getElementById("filter_CIT")
-    if (CITElement.checked) {
-        tags += "CIT "
-    }
-
-    let DCElement = document.getElementById("filter_DC")
-    if (DCElement.checked) {
-        tags += "DC "
-    }
-
-    let MCSElement = document.getElementById("filter_MCS")
-    if (MCSElement.checked) {
-        tags += "MCS "
-    }
-
-    let SCSElement = document.getElementById("filter_SCS")
-    if (SCSElement.checked) {
-        tags += "SCS "
-    }
-
-    let TPRElement = document.getElementById("filter_TPR")
-    if (TPRElement.checked) {
-        tags += "TPR "
-    }
-
-    let HNZElement = document.getElementById("filter_HNZ")
-    if (HNZElement.checked) {
-        tags += "HNZ "
-    }
+    filter_list.forEach(tag => {
+        if (document.getElementById(`filter_${tag}`).checked) {
+            tags += `${tag} `
+        }
+    })
 
     let filter_div = document.getElementById("filter")
-    while (filter_div.hasChildNodes()) {
-        filter_div.firstChild.remove();
-    }
-
-    filter_div.prepend(makeFilterElement(tags))
-    deleteMarkers();
+    filter_div = makeFilterElement(tags)
 
     let xhr = new XMLHttpRequest()
     xhr.onreadystatechange = function() {
         if (xhr.readyState !== 4) return
+        deleteMarkers()
         updatePage(xhr)
     }
 
@@ -327,9 +225,11 @@ function updateFilter() {
 }
 
 function deleteEvent(event_id) {
+
     let xhr = new XMLHttpRequest()
     xhr.onreadystatechange = function() {
         if (xhr.readyState !== 4) return
+        deleteMarkers()
         updatePage(xhr)
     }
 
@@ -343,13 +243,12 @@ function likeEvent(event_id) {
     xhr.onreadystatechange = function() {
         if (xhr.readyState != 4) return
         if (xhr.status == 200) {
-            // Change the button to "Unlike"
             let jsonResponse = JSON.parse(xhr.responseText);
             let like_count = jsonResponse.like_count[event_id];
             document.getElementById(`id_event_like_${event_id}`).innerHTML = `
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-heart-fill" viewBox="0 0 16 16">
-                <path fill-rule="evenodd" d="M8 1.314C12.438-3.248 23.534 4.735 8 15-7.534 4.736 3.562-3.248 8 1.314z"/>
-            </svg>  ${like_count}`;
+            <path fill-rule="evenodd" d="M8 1.314C12.438-3.248 23.534 4.735 8 15-7.534 4.736 3.562-3.248 8 1.314z"/>
+            </svg>  ${like_count}`
             document.getElementById(`id_event_like_${event_id}`).onclick = function () { unlikeEvent(event_id); };
         }
     }
@@ -365,13 +264,12 @@ function unlikeEvent(event_id) {
         if (xhr.readyState != 4) return
         updatePage(xhr)
         if (xhr.status == 200) {
-            // Change the button to "like"
             let jsonResponse = JSON.parse(xhr.responseText);
             let like_count = jsonResponse.like_count[event_id];
             document.getElementById(`id_event_like_${event_id}`).innerHTML = `
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-heart" viewBox="0 0 16 16">
             <path d="m8 2.748-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01L8 2.748zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143c.06.055.119.112.176.171a3.12 3.12 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15z"/>
-          </svg>  ${like_count}`;
+            </svg>  ${like_count}`;
             document.getElementById(`id_event_like_${event_id}`).onclick = function () { likeEvent(event_id); };
 
         }
@@ -399,6 +297,7 @@ function checkEventForm (context) {
         displayError("Please enter event end time", true)
         return false;
     }
+
     let startDate = new Date(context["startTimeValue"])
     let endDate = new Date(context["endTimeValue"])
 
@@ -406,7 +305,8 @@ function checkEventForm (context) {
         displayError("Event start time cannot be later than end time", true)
         return false;
     }
-    if (context["tags"] == "") {
+
+    if (context["tagValue"] == " ") {
         displayError("Please select event tags", true)
         return false;
     }
@@ -418,11 +318,10 @@ function addEvent() {
     let eventNameElement = document.getElementById("id_name_input_text")
     let eventNameValue = eventNameElement.value
 
-    
     let buildingElement = document.getElementById('id_building_location_input_text')
     let buildingAddr = buildingElement.value
 
-    let buildingName = ""
+    let buildingName
     let place = autocomplete.getPlace();
 
     if (place != null) {   
@@ -434,9 +333,6 @@ function addEvent() {
     }
 
     let geocoder = new google.maps.Geocoder();
-
-    let lng = '';
-    let lat = '';
 
     let descriptionElement = document.getElementById("id_description_input_text")
     let descriptionValue = descriptionElement.value
@@ -450,59 +346,22 @@ function addEvent() {
     let endTimeElement = document.getElementById("id_end_time_input_text")
     let endTimeValue = endTimeElement.value
 
-    let tags = " "
+    let tags = " ";
 
-    let allElement = document.getElementById("tag_all")
-    if (allElement.checked) {
+    console.log(`${filter_list.push("All")}`)
+    console.log(`${filter_list}`)
+
+    if (document.getElementById(`tag_All`).checked) {
         tags += "All "
     }
 
-    let undergradElement = document.getElementById("tag_undergrad")
-    if (undergradElement.checked) {
-        tags += "Undergrad "
-    }
+    filter_list.forEach(tag => {
+        if (document.getElementById(`tag_${tag}`).checked) {
+            tags += `${tag} `
+        }
+    })
 
-    let graduateElement = document.getElementById("tag_graduate")
-    if (graduateElement.checked) {
-        tags += "Graduate "
-    }
-
-    let CFAElement = document.getElementById("tag_CFA")
-    if (CFAElement.checked) {
-        tags += "CFA "
-    }
-
-    let CITElement = document.getElementById("tag_CIT")
-    if (CITElement.checked) {
-        tags += "CIT "
-    }
-
-    let DCElement = document.getElementById("tag_DC")
-    if (DCElement.checked) {
-        tags += "DC "
-    }
-
-    let MCSElement = document.getElementById("tag_MCS")
-    if (MCSElement.checked) {
-        tags += "MCS "
-    }
-
-    let SCSElement = document.getElementById("tag_SCS")
-    if (SCSElement.checked) {
-        tags += "SCS "
-    }
-
-    let TPRElement = document.getElementById("tag_TPR")
-    if (TPRElement.checked) {
-        tags += "TPR "
-    }
-
-    let HNZElement = document.getElementById("tag_HNZ")
-    if (HNZElement.checked) {
-        tags += "HNZ "
-    }
-
-    var context = {"eventNameValue": eventNameValue,
+    let context = {"eventNameValue": eventNameValue,
                "buildingValue": buildingAddr,
                "startTimeValue": startTimeValue,
                "endTimeValue": endTimeValue,
@@ -511,15 +370,11 @@ function addEvent() {
 
     if (checkEventForm(context)) {
         geocoder.geocode( {'address': buildingAddr}, function(results, status) {
-            //TODO error handling
             if (status == google.maps.GeocoderStatus.OK) {
-                var x = document.getElementById("new-event-block");
-                x.style.display = "none";
-                var btn = document.getElementById("new-event-btn")
-                btn.style.display = "block";
+                closeEvent()
 
-                lng = String(results[0].geometry.location.lng())
-                lat = String(results[0].geometry.location.lat())
+                let lng = String(results[0].geometry.location.lng())
+                let lat = String(results[0].geometry.location.lat())
     
                 let xhr = new XMLHttpRequest()
                 xhr.onreadystatechange = function() {
@@ -537,20 +392,15 @@ function addEvent() {
         });
     }
 }
+
 function closeEvent() {
     var x = document.getElementById("new-event-block");
     var btn = document.getElementById("new-event-btn")
-    if (x.style.display === "none") {
-      x.style.display = "block";
-      btn.style.display = "none";
-    } else {
-      x.style.display = "none";
-      btn.style.display = "block";
-    }
+    x.style.display = "none";
+    btn.style.display = "block";
 }
 
 function makeNewEventBlock() {
-    console.log("MAKE NEW EVENT BLOCK MADE")
     let elemet = document.getElementById("id_new_event")
     let details = `
         <div id="new-event-block">
@@ -599,9 +449,9 @@ function makeNewEventBlock() {
                 <path d="M6 4.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm-1 0a.5.5 0 1 0-1 0 .5.5 0 0 0 1 0z"/>
                 <path d="M2 1h4.586a1 1 0 0 1 .707.293l7 7a1 1 0 0 1 0 1.414l-4.586 4.586a1 1 0 0 1-1.414 0l-7-7A1 1 0 0 1 1 6.586V2a1 1 0 0 1 1-1zm0 5.586 7 7L13.586 9l-7-7H2v4.586z"/>
                 </svg>  Tags</label><br>
-                <input type="checkbox" name="tags" id="tag_all"> All 
-                <input type="checkbox" name="tags" id="tag_undergrad"> Undergrad 
-                <input type="checkbox" name="tags" id="tag_graduate"> Graduate <br>
+                <input type="checkbox" name="tags" id="tag_All"> All 
+                <input type="checkbox" name="tags" id="tag_Undergrad"> Undergrad 
+                <input type="checkbox" name="tags" id="tag_Graduate"> Graduate
                 <input type="checkbox" name="tags" id="tag_CFA"> CFA 
                 <input type="checkbox" name="tags" id="tag_CIT"> CIT 
                 <input type="checkbox" name="tags" id="tag_DC"> DC 
@@ -615,6 +465,7 @@ function makeNewEventBlock() {
             </div>
         </div>
     `
+    
     let element= document.createElement("div");
     element.innerHTML = `${details}`;
     elemet.prepend(element);

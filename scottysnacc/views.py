@@ -180,15 +180,14 @@ def get_events_json_dumps_serializer(request):
     if not request.user.is_authenticated:
         return _my_json_error_response("Not logged-in.", status=401)
 
-    liked_event_data = [] 
     active_event_data = []
     inactive_event_data = []
     like_count = {}
     user_liked_event_ids = []
     shouldShow = False
+    
     profile = get_or_create_user_profile(request.user)
     liked_events =  profile.liked_events
-    print(profile.tag)
 
     for event in models.Event.objects.all().order_by('-enddate'):
         shouldShow = False
@@ -215,10 +214,6 @@ def get_events_json_dumps_serializer(request):
                 shouldShow = True
 
         if (shouldShow):
-            if event in liked_events.all():
-                liked_event_data.append(e)
-            print(event.enddate.replace(tzinfo=pytz.UTC))
-            print(timezone.datetime.now().replace(tzinfo=pytz.timezone('US/Eastern')))
             if event.enddate.replace(tzinfo=pytz.UTC) > timezone.datetime.now().replace(tzinfo=pytz.timezone('US/Eastern')):
                 active_event_data.append(e)
             else:
@@ -226,8 +221,7 @@ def get_events_json_dumps_serializer(request):
 
     user_liked_event_ids += [event.id for event in liked_events.all()] 
 
-    response_data = {"liked_events": liked_event_data, 
-                     'active_events' : active_event_data, 
+    response_data = {'active_events' : active_event_data, 
                      'inactive_events' : inactive_event_data, 
                      'like_count': like_count,
                      "user_liked_event_ids": user_liked_event_ids,
