@@ -204,3 +204,7 @@ h2 {
     border-width: 0.1em;
     border-radius: 10px;
 }
+#update_error, #form_error {
+    font-weight: bold;
+    color: #A4161A;
+}

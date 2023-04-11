@@ -4,10 +4,9 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
 from django.urls import reverse
-from django.core import serializers
 from scottysnacc.models import Profile, Event
 from django.utils import timezone
-from django.http import HttpResponse, Http404
+from django.http import HttpResponse
 import json
 from scottysnacc import models
 from datetime import datetime
@@ -16,23 +15,23 @@ import pytz
 
 @login_required
 def map_action(request):
-    profile = get_or_create_user_profile(request.user)
+    get_or_create_user_profile(request.user)
     return render(request, "mapElement.html", {})
 
 def login_action(request):
     context = {}
 
-    # Just display the registration form if this is a GET request.
+    # Just display the registration form if this is a GET request
     if request.method == 'GET':
         context['form'] = LoginForm()
         return render(request, 'login.html', context)
 
     # Creates a bound form from the request POST parameters and makes the 
-    # form available in the request context dictionary.
+    # form available in the request context dictionary
     form = LoginForm(request.POST)
     context['form'] = form
 
-    # Validates the form.
+    # Validates the form
     if not form.is_valid():
         return render(request, 'login.html', context)
 
@@ -54,21 +53,21 @@ def logout_action(request):
 def register_action(request):
     context = {}
 
-    # Just display the registration form if this is a GET request.
+    # Just display the registration form if this is a GET request
     if request.method == 'GET':
         context['form'] = RegisterForm()
         return render(request, 'register.html', context)
 
     # Creates a bound form from the request POST parameters and makes the 
-    # form available in the request context dictionary.
+    # form available in the request context dictionary
     form = RegisterForm(request.POST)
     context['form'] = form
 
-    # Validates the form.
+    # Validates the form
     if not form.is_valid():
         return render(request, 'register.html', context)
 
-    # At this point, the form data is valid.  Register and login the user.
+    # At this point, the form data is valid.  Register and login the user
     new_user = User.objects.create_user(email=form.cleaned_data['email'],
                                         username=form.cleaned_data['username'],
                                         password=form.cleaned_data['password1'])
@@ -101,7 +100,6 @@ def filter_action(request):
     return get_events_json_dumps_serializer(request)
 
 def add_action(request):
-    #TODO more error handling
     if not request.user.is_authenticated:
         return _my_json_error_response("Not logged-in", status=401)
     
@@ -111,6 +109,27 @@ def add_action(request):
     if 'event_name' not in request.POST or not request.POST['event_name']:
         return _my_json_error_response("You must enter event name", status=400)
     
+    if ('lng' not in request.POST or not request.POST['lng']
+        or 'lat' not in request.POST or not request.POST['lat']
+        or 'buildingAddr' not in request.POST or not request.POST['buildingAddr']
+        or 'buildingName' not in request.POST or not request.POST['buildingName']):
+        return _my_json_error_response("You must enter event location", status=400)
+    
+    if 'description' not in request.POST:
+        return _my_json_error_response("Event description missing", status=400)
+    
+    if 'specLocation' not in request.POST:
+        return _my_json_error_response("Event specific location missing", status=400)
+    
+    if 'start' not in request.POST or not request.POST['start']:
+        return _my_json_error_response("You must enter event start time", status=400)
+    
+    if 'end' not in request.POST or not request.POST['end']:
+        return _my_json_error_response("You must enter event end time", status=400)
+    
+    if 'tag' not in request.POST or not request.POST['tag']:
+        return _my_json_error_response("You must enter event tags", status=400)
+
     event = models.Event()
     event.user = request.user
     event.name = request.POST['event_name']
@@ -123,6 +142,9 @@ def add_action(request):
     event.startdate = datetime.strptime(request.POST['start'], '%Y/%m/%d %H:%M')
     event.enddate = datetime.strptime(request.POST['end'], '%Y/%m/%d %H:%M')
     event.tag = request.POST['tag']
+
+    if event.startdate >= event.enddate:
+        return _my_json_error_response("Event start time cannot be later than end time", status=400)
 
     event.save()
 
@@ -155,6 +177,7 @@ def like_action(request, event_id):
         return _my_json_error_response("You must use a POST request for this operation", status=405)
     event_to_like = get_object_or_404(Event, id=event_id)
 
+    #TODO: check if the user currently doesn't like this
     profile = get_object_or_404(Profile, id=request.user.id)
     profile.liked_events.add(event_to_like)
     event_to_like.likeCount +=1
@@ -168,6 +191,7 @@ def unlike_action(request, event_id):
     if request.method != 'POST':
         return _my_json_error_response("You must use a POST request for this operation", status=405)
     
+    #TODO: check if the user previously liked this
     event_to_unlike = get_object_or_404(Event, id=event_id)
     event_to_unlike.likeCount-=1
     event_to_unlike.save() 
