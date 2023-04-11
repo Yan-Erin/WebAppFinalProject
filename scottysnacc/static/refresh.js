@@ -348,9 +348,6 @@ function addEvent() {
 
     let tags = " ";
 
-    console.log(`${filter_list.push("All")}`)
-    console.log(`${filter_list}`)
-
     if (document.getElementById(`tag_All`).checked) {
         tags += "All "
     }
@@ -465,7 +462,7 @@ function makeNewEventBlock() {
             </div>
         </div>
     `
-    
+
     let element= document.createElement("div");
     element.innerHTML = `${details}`;
     elemet.prepend(element);

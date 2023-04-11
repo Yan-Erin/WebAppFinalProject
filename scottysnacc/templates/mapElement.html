@@ -25,7 +25,6 @@
 
 <script>
     window.onload = getEvent;
-// ... also call getList every 5 seconds hereafter to update the list
     window.setInterval(getEvent, 5000);
     const current_user = "{{ request.user.id }}"
     const user_tags = " {{ request.user.profile.tag }}"

@@ -16,6 +16,7 @@ import pytz
 
 @login_required
 def map_action(request):
+    profile = get_or_create_user_profile(request.user)
     return render(request, "mapElement.html", {})
 
 def login_action(request):
@@ -33,7 +34,6 @@ def login_action(request):
 
     # Validates the form.
     if not form.is_valid():
-        print(context)
         return render(request, 'login.html', context)
 
     new_user = authenticate(username=form.cleaned_data['username'],
@@ -66,7 +66,6 @@ def register_action(request):
 
     # Validates the form.
     if not form.is_valid():
-        print("notvalid")
         return render(request, 'register.html', context)
 
     # At this point, the form data is valid.  Register and login the user.
@@ -155,14 +154,14 @@ def like_action(request, event_id):
     if request.method != 'POST':
         return _my_json_error_response("You must use a POST request for this operation", status=405)
     event_to_like = get_object_or_404(Event, id=event_id)
-    profile = get_or_create_user_profile(request.user)
+
+    profile = get_object_or_404(Profile, id=request.user.id)
     profile.liked_events.add(event_to_like)
     event_to_like.likeCount +=1
     event_to_like.save() 
     return get_events_json_dumps_serializer(request)
 
 def unlike_action(request, event_id):
-    print("UNLIKEING")
     if not request.user.is_authenticated:
         return _my_json_error_response("You must be logged in to do this operation", status=401)
 
@@ -185,8 +184,8 @@ def get_events_json_dumps_serializer(request):
     like_count = {}
     user_liked_event_ids = []
     shouldShow = False
-    
-    profile = get_or_create_user_profile(request.user)
+
+    profile = get_object_or_404(Profile, id=request.user.id)
     liked_events =  profile.liked_events
 
     for event in models.Event.objects.all().order_by('-enddate'):
