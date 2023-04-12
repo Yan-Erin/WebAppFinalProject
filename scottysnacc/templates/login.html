@@ -14,6 +14,13 @@
         <p class="heading_name">Hello Again!</p>
         <p id='id_page_name'>Enter your username and password to login to 
             <span style="color: #A4161A">ScottySnacc</span>:</p>
+        {% if messages %}
+            <ul class="messages">
+              {% for message in messages %}
+                <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+              {% endfor %}
+            </ul>
+          {% endif %}
         <form class="form-group" method="post" action="{% url 'login' %}">
             <table class="login-class">
                 {{form}}
