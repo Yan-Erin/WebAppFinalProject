@@ -130,18 +130,28 @@ function makeFilterElement(tags) {
 
     filter_list.forEach(tag => {
         if (tags.includes(`${tag}`)) {
-            details += `<input type="checkbox" name="tags" id="filter_${tag}" checked> ${tag} `
+            details += `<input type="checkbox" name="tags" class="filter-element" id="filter_${tag}" checked> ${tag} `
         } else {
-            details += `<input type="checkbox" name="tags" id="filter_${tag}"> ${tag} `
+            details += `<input type="checkbox" name="tags" class="filter-element" id="filter_${tag}"> ${tag} `
         }
     })
 
-    details += `<br> <button id='filter-submit' class='btn-default' onclick="updateFilter()">Update</button>`
+    let filterElement = document.createElement("div");
+    filterElement.innerHTML = `${details}`;
+    filterElement.className = "filter";
 
-    let element = document.createElement("div")
-    element.innerHTML = `${details}`
+    let filterButton = document.createElement("button");
+    filterButton.id = 'filter-submit';
+    filterButton.className = 'btn-default';
+    filterButton.onclick = updateFilter;
+    filterButton.innerHTML = "Update";
 
-    return element
+    let wrapper = document.createElement("div");
+    wrapper.className = "filter-wrapper";
+    wrapper.appendChild(filterElement);
+    wrapper.appendChild(filterButton);
+
+    return wrapper;
 }
 
 function makeEventElement(item, liked, active) {
