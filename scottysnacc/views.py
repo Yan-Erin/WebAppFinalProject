@@ -93,6 +93,15 @@ def get_or_create_user_profile(user):
     return profile
 
 def filter_action(request):
+    if not request.user.is_authenticated:
+        return _my_json_error_response("Not logged-in", status=401)
+    
+    if request.method == 'GET':
+        return _my_json_error_response("Invalid GET request", status=405)
+    
+    if 'tag' not in request.POST or not request.POST['tag']:
+        return _my_json_error_response("Invalid tag", status=400)
+    
     profile = get_object_or_404(Profile, id=request.user.id)
     profile.tag = request.POST['tag']
     profile.save()
@@ -154,8 +163,8 @@ def delete_action(request, event_id):
     if not request.user.is_authenticated:
         return _my_json_error_response("You must be logged in to do this operation", status=401)
 
-    if request.method != 'POST':
-        return _my_json_error_response("You must use a POST request for this operation", status=405)
+    if request.method == 'GET':
+        return _my_json_error_response("Invalid GET request", status=405)
 
     try:
         event = models.Event.objects.get(id=event_id)
@@ -173,12 +182,16 @@ def like_action(request, event_id):
     if not request.user.is_authenticated:
         return _my_json_error_response("You must be logged in to do this operation", status=401)
 
-    if request.method != 'POST':
-        return _my_json_error_response("You must use a POST request for this operation", status=405)
+    if request.method == 'GET':
+        return _my_json_error_response("Invalid GET request", status=405)
+    
     event_to_like = get_object_or_404(Event, id=event_id)
 
-    #TODO: check if the user currently doesn't like this
     profile = get_object_or_404(Profile, id=request.user.id)
+
+    if (event_to_like in profile.liked_events.all()):
+        return _my_json_error_response("Event is already liked", status=400)
+    
     profile.liked_events.add(event_to_like)
     event_to_like.likeCount +=1
     event_to_like.save() 
@@ -191,12 +204,17 @@ def unlike_action(request, event_id):
     if request.method != 'POST':
         return _my_json_error_response("You must use a POST request for this operation", status=405)
     
-    #TODO: check if the user previously liked this
     event_to_unlike = get_object_or_404(Event, id=event_id)
+
+    profile = get_object_or_404(Profile, id=request.user.id)
+
+    if not (event_to_unlike in profile.liked_events.all()):
+        return _my_json_error_response("Event is already unliked", status=400)
+    
     event_to_unlike.likeCount-=1
     event_to_unlike.save() 
-    request.user.profile.liked_events.remove(event_to_unlike)
-    request.user.profile.save()
+    profile.liked_events.remove(event_to_unlike)
+    profile.save()
     return get_events_json_dumps_serializer(request)
 
 def get_events_json_dumps_serializer(request):
