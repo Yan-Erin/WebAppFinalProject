@@ -8,5 +8,5 @@ def check_email_domain(backend, details, response, *args, **kwargs):
     if email and email.endswith('@andrew.cmu.edu'):
         return
     else:
-        messages.error(kwargs['request'], "Invalid email domain. Please use an '@andrew.cmu.edu' email.")
+        messages.error(kwargs['request'], "Invalid email domain. Please use an '@andrew.cmu.edu' email")
         return redirect(reverse('login'))
