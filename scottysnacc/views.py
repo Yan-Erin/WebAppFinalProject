@@ -148,8 +148,8 @@ def add_action(request):
     event.buildingName = request.POST['buildingName']
     event.description = request.POST['description']
     event.specLocation = request.POST['specLocation']
-    event.startdate = datetime.strptime(request.POST['start'], '%Y/%m/%d %H:%M').replace(tzinfo=pytz.timezone('US/Eastern'))
-    event.enddate = datetime.strptime(request.POST['end'], '%Y/%m/%d %H:%M').replace(tzinfo=pytz.timezone('US/Eastern'))
+    event.startdate = datetime.strptime(request.POST['start'] + ':00', '%Y/%m/%d %H:%M:%S').replace(tzinfo=pytz.timezone('US/Eastern'))
+    event.enddate = datetime.strptime(request.POST['end'] + ':00', '%Y/%m/%d %H:%M:%S').replace(tzinfo=pytz.timezone('US/Eastern'))
     event.tag = request.POST['tag']
 
     if event.startdate >= event.enddate:
