@@ -148,8 +148,8 @@ def add_action(request):
     event.buildingName = request.POST['buildingName']
     event.description = request.POST['description']
     event.specLocation = request.POST['specLocation']
-    event.startdate = datetime.strptime(request.POST['start'], '%Y/%m/%d %H:%M')
-    event.enddate = datetime.strptime(request.POST['end'], '%Y/%m/%d %H:%M')
+    event.startdate = datetime.strptime(request.POST['start'], '%Y/%m/%d %H:%M').replace(tzinfo=pytz.timezone('US/Eastern'))
+    event.enddate = datetime.strptime(request.POST['end'], '%Y/%m/%d %H:%M').replace(tzinfo=pytz.timezone('US/Eastern'))
     event.tag = request.POST['tag']
 
     if event.startdate >= event.enddate:
@@ -255,7 +255,7 @@ def get_events_json_dumps_serializer(request):
                 shouldShow = True
 
         if (shouldShow):
-            if event.enddate.replace(tzinfo=pytz.UTC) > timezone.datetime.now().replace(tzinfo=pytz.timezone('US/Eastern')):
+            if event.enddate.replace(tzinfo=pytz.timezone('US/Eastern')) > timezone.datetime.now().replace(tzinfo=pytz.timezone('US/Eastern')):
                 active_event_data.append(e)
             else:
                 inactive_event_data.append(e)

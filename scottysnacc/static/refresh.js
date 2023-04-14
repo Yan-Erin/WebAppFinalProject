@@ -86,26 +86,43 @@ function updateEventList(liked_set, active_items, inactive_items, tags) {
         return inlist;
     }
 
-    [inactive_items, active_items].forEach(event => {
-        event.forEach(item => {
-            event_div.prepend(makeEventElement(item, isItemLiked(item), true))
-            let setMarker = true
-            let location = new google.maps.LatLng(Number(item.lat), Number(item.lng))
-            for (var i = 0; i < markers.length; i++) {
-                if (markers[i].getPosition().equals(location)) {
-                    setMarker = false
-                }
+    inactive_items.forEach(item => {
+        event_div.append(makeEventElement(item, isItemLiked(item), false))
+        let setMarker = true
+        let location = new google.maps.LatLng(Number(item.lat), Number(item.lng))
+        for (var i = 0; i < markers.length; i++) {
+            if (markers[i].getPosition().equals(location)) {
+                setMarker = false
             }
-    
-            if (setMarker) {
-                let marker = new google.maps.Marker({position: location, map: map})
-                markers.push(marker)
-                marker.addListener("click", () => {
-                let eventElement = document.getElementById(`id_event_element_${item.id}`).scrollIntoView()
-                }) 
+        }
+
+        if (setMarker) {
+            let marker = new google.maps.Marker({position: location, map: map})
+            markers.push(marker)
+            marker.addListener("click", () => {
+            let eventElement = document.getElementById(`id_event_element_${item.id}`).scrollIntoView()
+            }) 
+        }
+    })
+
+    active_items.forEach(item => {
+        event_div.prepend(makeEventElement(item, isItemLiked(item), true))
+        let setMarker = true
+        let location = new google.maps.LatLng(Number(item.lat), Number(item.lng))
+        for (var i = 0; i < markers.length; i++) {
+            if (markers[i].getPosition().equals(location)) {
+                setMarker = false
             }
-        })
-    }) 
+        }
+
+        if (setMarker) {
+            let marker = new google.maps.Marker({position: location, map: map})
+            markers.push(marker)
+            marker.addListener("click", () => {
+            let eventElement = document.getElementById(`id_event_element_${item.id}`).scrollIntoView()
+            }) 
+        }
+    })
 
     let filter_div = document.getElementById("filter")
     if (filter_div.innerHTML === "") {
