@@ -5,13 +5,13 @@ from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
 from django.urls import reverse
 from scottysnacc.models import Profile, Event
-from django.utils import timezone
+from django.utils import timezone as tz
 from django.http import HttpResponse
 import json
 from scottysnacc import models
 from datetime import datetime
 from django.core.exceptions import ObjectDoesNotExist
-import pytz
+from pytz import timezone
 
 @login_required
 def map_action(request):
@@ -148,8 +148,8 @@ def add_action(request):
     event.buildingName = request.POST['buildingName']
     event.description = request.POST['description']
     event.specLocation = request.POST['specLocation']
-    event.startdate = datetime.strptime(request.POST['start'], '%Y/%m/%d %H:%M').replace(tzinfo=pytz.timezone('US/Eastern'))
-    event.enddate = datetime.strptime(request.POST['end'], '%Y/%m/%d %H:%M').replace(tzinfo=pytz.timezone('US/Eastern'))
+    event.startdate = timezone('US/Eastern').localize(datetime.strptime(request.POST['start'], '%Y/%m/%d %H:%M'))
+    event.enddate = timezone('US/Eastern').localize(datetime.strptime(request.POST['end'], '%Y/%m/%d %H:%M'))
     event.tag = request.POST['tag']
 
     if event.startdate >= event.enddate:
@@ -247,7 +247,7 @@ def get_events_json_dumps_serializer(request):
             'id': event.id,
             'likeCount': event.likeCount
             }
-        
+
         like_count[event.id] = event.likeCount
 
         for tag in profile.tag.split():
@@ -255,7 +255,7 @@ def get_events_json_dumps_serializer(request):
                 shouldShow = True
 
         if (shouldShow):
-            if event.enddate.replace(tzinfo=pytz.timezone('US/Eastern')) > timezone.datetime.now().replace(tzinfo=pytz.timezone('US/Eastern')):
+            if event.enddate > tz.datetime.now().astimezone(timezone('US/Eastern')):
                 active_event_data.append(e)
             else:
                 inactive_event_data.append(e)
