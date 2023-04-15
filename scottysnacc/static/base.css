@@ -19,12 +19,12 @@ h2 {
 }
 .inactive-event {
     background-color: #e6e6e6;
-    padding:3rem 3rem 2rem 6rem;
+    padding:3vh 3vw 2vh 3vw;
     border-bottom: 1px solid #717579;
 }
 .event {
     background-color: #F5F3F4;
-    padding:3rem 3rem 2rem 6rem;
+    padding:3vh 3vw 2vh 3vw;
     border-bottom: 1px solid #717579;
 }
 .event-title {
@@ -36,7 +36,7 @@ h2 {
 }
 .filter {
     margin-top: 1rem;
-    margin-left: 5%;
+    margin: auto;
     max-width: 90%;
     display: grid;
     grid-template-columns: auto auto auto auto auto auto;
@@ -93,7 +93,6 @@ h2 {
     transition: 0.2s;
     border-style: solid;
 }
-
 .close-btn {
     width: 2.7rem;
     display: block;
@@ -223,4 +222,14 @@ h2 {
 }
 #update_error, #form_error, .errorlist {
     color: #A4161A;
+}
+@media (max-width: 1000px){
+    .filter {
+        grid-template-columns: auto auto auto auto;
+    }
+}
+@media (max-width: 650px){
+    .filter {
+        grid-template-columns: auto auto;
+    }
 }
