@@ -194,7 +194,8 @@ def like_action(request, event_id):
     
     profile.liked_events.add(event_to_like)
     event_to_like.likeCount +=1
-    event_to_like.save() 
+    event_to_like.save()
+    profile.save()
     return get_events_json_dumps_serializer(request)
 
 def unlike_action(request, event_id):
