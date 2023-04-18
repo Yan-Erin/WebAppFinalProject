@@ -20,6 +20,6 @@ To clone our site follow the steps below
   <li>Install Django `pip install django`</li>
   <li>Install nessesary requirements `pip install -r requirements.txt` </li>
   <li>Make migrations `python3 manage.py makemigrations`</li>
-  <li>Migrate `python3 manage.py migrate </li>
+  <li>Migrate `python3 manage.py migrate` </li>
   <li>Run the server `python3 manage.py runserver`</li>
 <ol>
