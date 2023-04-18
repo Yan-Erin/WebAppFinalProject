@@ -11,7 +11,7 @@ Scotty Snaccs is hosted by EC2 and apache. Domain link was provided by 17-437 co
 # Check out our site at:
 https://team7.cmu-webapps.com/
 # Check out our video demo below
-![](https://github.com/s23_team_7/scottysnaccdemo.gif)
+![](https://github.com/cmu-webapps/s23_team_7/blob/main/scottysnaccdemo.gif)
 # Clone our site by:
 To clone our site follow the steps below
 <ol>
