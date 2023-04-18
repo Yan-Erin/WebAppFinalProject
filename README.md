@@ -1,13 +1,13 @@
 
-# What is Scotty Snacc?  ![image](https://user-images.githubusercontent.com/68751020/232847044-8cf617bb-9b74-4e48-b622-e4cdd63c4945.png)
+# What is ScottySnacc?  ![image](https://user-images.githubusercontent.com/68751020/232847044-8cf617bb-9b74-4e48-b622-e4cdd63c4945.png)
 Repository for s23_team_7 – Erin Yan & Vicky Liu </br> </br>
-Scotty Snaccs is a web application made with Django for our 17-437 final project. In this app, we let users enter their free food events around campus and see the events that other people entered. </br>
+ScottySnacc is a web application made with Django for our 17-437 final project. In this app, we let users enter their free food events around campus and see the events that other people entered. </br>
 <ul>
   <li>Create free food events around campus to advertise</li>
-  <li>Find free food events that your friends posted </li>
+  <li>Find free food events that your friends posted</li>
   <li>Like events and see their locations around campus</li>
 </ul>
-Scotty Snaccs is hosted by EC2 and apache. Domain link was provided by 17-437 course staff.
+ScottySnacc is hosted by EC2 and Apache. Domain link was provided by 17-437 course staff.
 
 # Check out our site at:
 https://team7.cmu-webapps.com/
@@ -39,6 +39,6 @@ To clone our site follow the steps below
   6. Migrate `python3 manage.py migrate` 
   7. Run the server `python3 manage.py runserver`
 # Special Thanks To:
-* Prof. Jeffery Eppinger for answering our Piazza questions and giving us lots of advice
+* Prof. Jeffery Eppinger for answering our Piazza questions and giving us lots of advice.
 * 17-437 Course Staff for their great support throughout this semester.
 
