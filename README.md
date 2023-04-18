@@ -21,9 +21,9 @@ https://team7.cmu-webapps.com/
 Major frameworks/libraries used in our project.
 
 * <img src="https://user-images.githubusercontent.com/68751020/232849802-3a58d55c-bbfe-4eb4-bc4d-043facbeb56b.png" width=25> Django
-* <img src="https://upload.wikimedia.org/wikipedia/commons/6/6a/JavaScript-logo.png"> Javascript
-* Google Oauth
-* Bootstrap
+* <img src="https://upload.wikimedia.org/wikipedia/commons/6/6a/JavaScript-logo.png" width=25> Javascript
+* <img src="https://img.freepik.com/free-icon/search_318-265146.jpg" width=25> Google Oauth
+* <img src="https://seeklogo.com/images/B/bootstrap-logo-3C30FB2A16-seeklogo.com.png" width=25> Bootstrap
 ## Built by:
 * @yan-erin
 * @itsvickyliu
