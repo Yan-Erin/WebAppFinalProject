@@ -243,6 +243,9 @@ h2 {
 #update_error, #form_error, .errorlist {
     color: #A4161A;
 }
+.messages {
+    color: #A4161A;
+}
 @media (max-width: 1000px){
     .filter {
         grid-template-columns: auto auto auto auto;
