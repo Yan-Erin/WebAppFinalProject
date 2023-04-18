@@ -20,7 +20,8 @@ https://team7.cmu-webapps.com/
 ## Built with:
 Major frameworks/libraries used in our project.
 
-* Djano
+* <img src="https://user-images.githubusercontent.com/68751020/232849802-3a58d55c-bbfe-4eb4-bc4d-043facbeb56b.png" width=25> Django
+* <img src="https://upload.wikimedia.org/wikipedia/commons/6/6a/JavaScript-logo.png"> Javascript
 * Google Oauth
 * Bootstrap
 ## Built by:
