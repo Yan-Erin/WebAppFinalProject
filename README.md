@@ -1,5 +1,5 @@
 
-# What is Scotty Snacc?
+# What is Scotty Snacc?  ![image](https://user-images.githubusercontent.com/68751020/232847044-8cf617bb-9b74-4e48-b622-e4cdd63c4945.png)
 Repository for s23_team_7 – Erin Yan & Vicky Liu </br> </br>
 Scotty Snaccs is a web application made with Django for our 17-437 final project. In this app, we let users enter their free food events around campus and see the events that other people entered. </br>
 <ul>
@@ -11,6 +11,8 @@ Scotty Snaccs is hosted by EC2 and apache. Domain link was provided by 17-437 co
 
 # Check out our site at:
 https://team7.cmu-webapps.com/
+![image](https://user-images.githubusercontent.com/68751020/232847520-d0eac19a-b35d-405c-a576-80709e7c7640.png)
+
 # Check out our video demo below
 ![](https://github.com/cmu-webapps/s23_team_7/blob/main/scottysnaccdemo.gif)
 
