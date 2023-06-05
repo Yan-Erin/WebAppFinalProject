@@ -160,5 +160,5 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 #         ("zoom", 15),
 #         ("mapCenterLocationName", [40.443336, -79.944023]),
 #     ),
-#     "GOOGLE_MAP_API_KEY": "AIzaSyAz_8eAQta7W3gX5XwBswQDeNo2TmLCPXI"
+#     "GOOGLE_MAP_API_KEY": ""
 # }
